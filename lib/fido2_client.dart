@@ -30,13 +30,13 @@ class Fido2Client {
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
+      case 'debug': print('debug'); break;
       case 'onRegistrationComplete':
         // WARNING: Do not add generics like Map<String, dynamic> - this causes breaking changes
         Map args = call.arguments;
-        String keyHandleBase64 = args['keyHandleBase'];
+        String keyHandleBase64 = args['keyHandle'];
         String clientDataJson = args['clientDataJson'];
         String attestationObj = args['attestationObject'];
-        print('Results: $keyHandleBase64, $clientDataJson, $attestationObj');
         for (var callback in _savedRegistrationListeners) callback(keyHandleBase64, clientDataJson, attestationObj);
         break;
       case 'onSigningComplete':
@@ -61,9 +61,10 @@ class Fido2Client {
     await _channel.invokeMethod('initiateRegistrationProcess', args);
   }
 
-  Future<void> initiateSigningProcess(String challenge) async {
+  Future<void> initiateSigningProcess(String keyHandle, String challenge) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
+    args.putIfAbsent('keyHandle', () => keyHandle);
     await _channel.invokeMethod('initiateSigningProcess', args);
   }
 }

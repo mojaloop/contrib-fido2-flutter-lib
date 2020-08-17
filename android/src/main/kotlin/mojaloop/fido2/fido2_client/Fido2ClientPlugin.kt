@@ -89,8 +89,9 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                 initiateRegistrationProcess(challenge, userId, username)
             }
             "initiateSigningProcess" -> {
+                val keyHandleBase64 = call.argument<String>("keyHandle")!!
                 val challenge = call.argument<String>("challenge")!!
-                initiateSigningProcess(challenge)
+                initiateSigningProcess(keyHandleBase64, challenge)
             }
             else -> {
                 result.notImplemented()
@@ -142,14 +143,14 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateSigningProcess(challenge: String) {
+    private fun initiateSigningProcess(keyHandleBase64: String, challenge: String) {
         val options = PublicKeyCredentialRequestOptions.Builder()
                 .setRpId(RP_DOMAIN)
                 .setAllowList(
                         listOf(
                                 PublicKeyCredentialDescriptor(
                                         PublicKeyCredentialType.PUBLIC_KEY.toString(),
-                                        loadKeyHandle(),
+                                        Base64.decode(keyHandleBase64, Base64.DEFAULT),
                                         null
                                 )
                         )
@@ -208,6 +209,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         args["keyHandle"] = keyHandleBase64
         args["clientDataJson"] = clientDataJson
         args["attestationObject"] = attestationObjectBase64
+
         channel.invokeMethod("onRegistrationComplete", args)
     }
 
@@ -225,7 +227,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         args["authData"] = authenticatorDataBase64
         args["signature"] = signatureBase64
 
-        channel.invokeMethod("onSigningComplete", null)
+        channel.invokeMethod("onSigningComplete", args)
     }
 
     private fun storeKeyHandle(keyHandle: ByteArray) {
