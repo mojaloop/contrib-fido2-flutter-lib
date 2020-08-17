@@ -37,6 +37,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
             val channel = MethodChannel(registrar.messenger(), "fido2_client")
             channel.setMethodCallHandler(instance)
             registrar.addActivityResultListener(instance)
+
         }
 
         const val REGISTER_REQUEST_CODE = 1
@@ -98,8 +99,6 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     private fun initiateRegistrationProcess(challenge: String, userId: String, username: String) {
-        channel.invokeMethod("print", null)
-        print("Registration initiated")
         val rpEntity = PublicKeyCredentialRpEntity(RP_DOMAIN, RP_NAME, null)
         // All the option parameters should come from the Relying Party / server
         val options = PublicKeyCredentialCreationOptions.Builder()
@@ -205,7 +204,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         val clientDataJson = String(response.clientDataJSON, Charsets.UTF_8)
         val attestationObjectBase64 = Base64.encodeToString(response.attestationObject, Base64.DEFAULT)
 
-        val args = HashMap<String, Any>();
+        val args = HashMap<String, String>();
         args["keyHandleBase64"] = keyHandleBase64
         args["clientDataJson"] = clientDataJson
         args["attestationObject"] = attestationObjectBase64

@@ -22,15 +22,14 @@ class Fido2Client {
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
-      case 'print':
-        print("Debug");
-        break;
       case 'onRegistrationComplete':
-        Map<String, dynamic> args = call.arguments;
-        String keyHandle = args['keyHandleBase64'];
-        String clientData = args['clientDataJson'];
-        String attestationObj = args['attestationObject'];
-        print('Results: $keyHandle, $clientData, $attestationObj');
+        print('Reached');
+        // WARNING: Do not add generics like Map<String, dynamic> - this causes breaking changes
+        Map m = call.arguments; // how to get this back
+        String keyHandleBase64 = m['keyHandleBase64'];
+        String clientDataJson = m['clientDataJson'];
+        String attestationObject = m['attestationObject'];
+        print('Results: $keyHandleBase64, $clientDataJson, $attestationObject');
         for (var callback in _savedRegistrationListeners) callback();
         break;
       case 'onSigningComplete':
