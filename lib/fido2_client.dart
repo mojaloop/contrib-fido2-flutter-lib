@@ -24,6 +24,9 @@ class Fido2Client {
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
+      case 'print':
+        print("Debug");
+        break;
       case 'onRegistrationComplete':
         for (var callback in _savedRegistrationListeners) callback();
         break;
@@ -46,7 +49,7 @@ class Fido2Client {
     await _channel.invokeMethod('showToast', args);
   }
 
-  static Future<void> initiateRegistrationProcess(String challenge, String userId, String username) async {
+  Future<void> initiateRegistrationProcess(String challenge, String userId, String username) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('userId', () => userId);
@@ -54,7 +57,7 @@ class Fido2Client {
     await _channel.invokeMethod('initiateRegistrationProcess', args);
   }
 
-  static Future<void> initiateSigningProcess(String challenge) async {
+  Future<void> initiateSigningProcess(String challenge) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     await _channel.invokeMethod('initiateSigningProcess', args);

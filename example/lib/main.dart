@@ -51,7 +51,11 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: RaisedButton(child: Text('Press here'), onPressed: () {
-            Fido2Client.initiateRegistrationProcess("randomchallenge1231321", "kkzeng@edu.uwaterloo.ca", "kkzeng");
+            var fidoClient = Fido2Client();
+            fidoClient.addRegistrationResultListener(() {
+              print('Received result of registration');
+            });
+            fidoClient.initiateRegistrationProcess("randomchallenge1231321", "kkzeng@edu.uwaterloo.ca", "kkzeng");
           },)
         ),
       ),

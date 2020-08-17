@@ -5,9 +5,7 @@ import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.preference.PreferenceManager
-import android.provider.Settings.Global.putString
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.NonNull;
 import com.google.android.gms.fido.Fido
@@ -33,7 +31,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "fido2_client")
-        channel.setMethodCallHandler(this);
+        channel.setMethodCallHandler(this)
     }
 
     override fun onDetachedFromActivity() {
@@ -42,10 +40,12 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
         activity = binding.activity
+        binding.addActivityResultListener(this)
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity;
+        binding.addActivityResultListener(this)
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
@@ -55,8 +55,10 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     companion object {
         @JvmStatic
         fun registerWith(registrar: Registrar) {
+            val instance = Fido2ClientPlugin()
             val channel = MethodChannel(registrar.messenger(), "fido2_client")
-            channel.setMethodCallHandler(Fido2ClientPlugin())
+            channel.setMethodCallHandler(instance)
+            registrar.addActivityResultListener(instance)
         }
 
         const val REGISTER_REQUEST_CODE = 1
@@ -93,6 +95,8 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     private fun initiateRegistrationProcess(challenge: String, userId: String, username: String) {
+        channel.invokeMethod("print", null)
+        print("Registration initiated")
         val rpEntity = PublicKeyCredentialRpEntity(RP_DOMAIN, RP_NAME, null)
         // All the option parameters should come from the Relying Party / server
         val options = PublicKeyCredentialCreationOptions.Builder()
@@ -178,8 +182,8 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     } else if (it.hasExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)) {
                         val fido2Response = data.getByteArrayExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)
                         when (requestCode) {
-                            REGISTER_REQUEST_CODE -> processRegisterResponse()
-                            SIGN_REQUEST_CODE -> processSigningResponse()
+                            REGISTER_REQUEST_CODE -> processRegisterResponse(fido2Response)
+                            SIGN_REQUEST_CODE -> processSigningResponse(fido2Response)
                         }
                     }
                 }
@@ -191,13 +195,23 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         return true
     }
 
-    // TODO: need to send it back to native platform for handling
-    private fun processRegisterResponse() {
+    // TODO: need to process data and add arguments
+    private fun processRegisterResponse(fidoResponse: ByteArray) {
+        val response = AuthenticatorAttestationResponse.deserializeFromBytes(fidoResponse)
+        val keyHandleBase64 = Base64.encodeToString(response.keyHandle, Base64.DEFAULT)
+        val clientDataJson = String(response.clientDataJSON, Charsets.UTF_8)
+        val attestationObjectBase64 = Base64.encodeToString(response.attestationObject, Base64.DEFAULT)
+
+        val args = HashMap<String, Any>();
+        args["keyHandleBase64"] = keyHandleBase64
+        args["clientDataJson"] = clientDataJson
+        args["attestationObject"] = attestationObjectBase64
+        channel.invokeMethod("onRegistrationComplete", null)
     }
 
-    // TODO: need to send it back to native platform for handling
-    private fun processSigningResponse() {
-
+    // TODO: need to process data and add arguments
+    private fun processSigningResponse(fidoResponse: ByteArray) {
+        channel.invokeMethod("onSigningComplete", null)
     }
 
     private fun storeKeyHandle(keyHandle: ByteArray) {
