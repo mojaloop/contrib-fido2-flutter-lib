@@ -3,37 +3,50 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+typedef RegistrationResultListener = Function(String keyHandle, String clientData, String attestationObj);
+typedef SigningResultListener = Function(String keyHandle, String clientData, String authData, String signature);
+
 class Fido2Client {
+
   MethodChannel _channel = const MethodChannel('fido2_client');
-  List<Function> _savedRegistrationListeners = [];
+  List<RegistrationResultListener> _savedRegistrationListeners = [];
   List<Function> _savedSigningListeners = [];
 
   Fido2Client() {
     _channel.setMethodCallHandler(_handleMethod);
   }
 
-  void addRegistrationResultListener(Function listener) {
-    _savedRegistrationListeners.add(listener);
+  // Listener should take 3 arguments
+  // (keyHandle, clientData, attestationObj)
+  void addRegistrationResultListener(RegistrationResultListener l) {
+    _savedRegistrationListeners.add(l);
   }
 
-  void addSigningResultListener(Function listener) {
-    _savedSigningListeners.add(listener);
+  // Listener should take 3 arguments
+  // (keyHandle, clientData, authData, signature)
+  void addSigningResultListener(SigningResultListener l) {
+    _savedSigningListeners.add(l);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'onRegistrationComplete':
-        print('Reached');
         // WARNING: Do not add generics like Map<String, dynamic> - this causes breaking changes
-        Map m = call.arguments; // how to get this back
-        String keyHandleBase64 = m['keyHandleBase64'];
-        String clientDataJson = m['clientDataJson'];
-        String attestationObject = m['attestationObject'];
-        print('Results: $keyHandleBase64, $clientDataJson, $attestationObject');
-        for (var callback in _savedRegistrationListeners) callback();
+        Map args = call.arguments;
+        String keyHandleBase64 = args['keyHandleBase'];
+        String clientDataJson = args['clientDataJson'];
+        String attestationObj = args['attestationObject'];
+        print('Results: $keyHandleBase64, $clientDataJson, $attestationObj');
+        for (var callback in _savedRegistrationListeners) callback(keyHandleBase64, clientDataJson, attestationObj);
         break;
       case 'onSigningComplete':
-        for (var callback in _savedSigningListeners) callback();
+        // WARNING: Do not add generics like Map<String, dynamic> - this causes breaking changes
+        Map args = call.arguments;
+        String keyHandleBase64 = args['keyHandle'];
+        String clientDataJson = args['clientDataJson'];
+        String authenticatorDataBase64 = args['authData'];
+        String signatureBase64 = args['signature'];
+        for (var callback in _savedSigningListeners) callback(keyHandleBase64, clientDataJson, authenticatorDataBase64, signatureBase64);
         break;
       default:
         throw ('Method not defined');

@@ -205,7 +205,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         val attestationObjectBase64 = Base64.encodeToString(response.attestationObject, Base64.DEFAULT)
 
         val args = HashMap<String, String>();
-        args["keyHandleBase64"] = keyHandleBase64
+        args["keyHandle"] = keyHandleBase64
         args["clientDataJson"] = clientDataJson
         args["attestationObject"] = attestationObjectBase64
         channel.invokeMethod("onRegistrationComplete", args)
@@ -213,6 +213,18 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
 
     // TODO: need to process data and add arguments
     private fun processSigningResponse(fidoResponse: ByteArray) {
+        val response = AuthenticatorAssertionResponse.deserializeFromBytes(fidoResponse)
+        val keyHandleBase64 = Base64.encodeToString(response.keyHandle, Base64.DEFAULT)
+        val clientDataJson = String(response.clientDataJSON, Charsets.UTF_8)
+        val authenticatorDataBase64 = Base64.encodeToString(response.authenticatorData, Base64.DEFAULT)
+        val signatureBase64 = Base64.encodeToString(response.signature, Base64.DEFAULT)
+
+        val args = HashMap<String, String>();
+        args["keyHandle"] = keyHandleBase64
+        args["clientDataJson"] = clientDataJson
+        args["authData"] = authenticatorDataBase64
+        args["signature"] = signatureBase64
+
         channel.invokeMethod("onSigningComplete", null)
     }
 
