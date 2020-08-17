@@ -28,6 +28,11 @@ class Fido2Client {
         print("Debug");
         break;
       case 'onRegistrationComplete':
+        Map<String, dynamic> args = call.arguments;
+        String keyHandle = args['keyHandleBase64'];
+        String clientData = args['clientDataJson'];
+        String attestationObj = args['attestationObject'];
+        print('Results: $keyHandle, $clientData, $attestationObj');
         for (var callback in _savedRegistrationListeners) callback();
         break;
       case 'onSigningComplete':

@@ -27,30 +27,8 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel : MethodChannel
-    private lateinit var activity: Activity
-
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "fido2_client")
-        channel.setMethodCallHandler(this)
-    }
-
-    override fun onDetachedFromActivity() {
-        // no-op
-    }
-
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        activity = binding.activity
-        binding.addActivityResultListener(this)
-    }
-
-    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        activity = binding.activity;
-        binding.addActivityResultListener(this)
-    }
-
-    override fun onDetachedFromActivityForConfigChanges() {
-        // no-op
-    }
+    private var binding: ActivityPluginBinding?= null
+    private var activity: Activity? = null
 
     companion object {
         @JvmStatic
@@ -66,6 +44,38 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         const val RP_DOMAIN = "mojapay-test-rp.web.app"
         const val RP_NAME = "MojapayFido2"
         const val KEY_HANDLE_PREF = "KEY_HANDLE_PREF"
+    }
+    
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "fido2_client")
+        channel.setMethodCallHandler(this)
+    }
+
+    override fun onDetachedFromActivity() {
+        disposeActivity()
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        attachToActivity(binding)
+    }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        attachToActivity(binding)
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        disposeActivity()
+    }
+
+    private fun disposeActivity() {
+        binding?.removeActivityResultListener(this)
+        binding = null
+        activity = null
+    }
+    private fun attachToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity;
+        binding.addActivityResultListener(this)
+        this.binding = binding
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -159,7 +169,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         val result = fidoClient.getSignPendingIntent(options)
         result.addOnSuccessListener { pendingIntent ->
             if(pendingIntent != null) {
-                activity.startIntentSenderForResult(pendingIntent.intentSender,
+                activity?.startIntentSenderForResult(pendingIntent.intentSender,
                         SIGN_REQUEST_CODE,
                         null,
                         0,
@@ -215,16 +225,20 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     private fun storeKeyHandle(keyHandle: ByteArray) {
-        with(PreferenceManager.getDefaultSharedPreferences(activity).edit()) {
-            putString(KEY_HANDLE_PREF, Base64.encodeToString(keyHandle, Base64.DEFAULT))
-            apply()
+        activity?.let {
+            with(PreferenceManager.getDefaultSharedPreferences(it).edit()) {
+                putString(KEY_HANDLE_PREF, Base64.encodeToString(keyHandle, Base64.DEFAULT))
+                apply()
+            }
         }
     }
 
     private fun loadKeyHandle(): ByteArray? {
-        val keyHandleBase64 = PreferenceManager.getDefaultSharedPreferences(activity).getString(KEY_HANDLE_PREF, null)
-                ?: return null
-        return Base64.decode(keyHandleBase64, Base64.DEFAULT)
+        activity?.let {
+            val keyHandleBase64 = PreferenceManager.getDefaultSharedPreferences(it).getString(KEY_HANDLE_PREF, null)
+                    ?: return null
+            return Base64.decode(keyHandleBase64, Base64.DEFAULT)
+        }
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
