@@ -1,0 +1,3 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="mojaloop.fido2.fido2_client">
+</manifest>
