@@ -80,13 +80,6 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
-            "getPlatformVersion" -> {
-                result.success("Android ${android.os.Build.VERSION.RELEASE}")
-            }
-            "showToast" -> {
-                val msg = call.argument<String>("msg")
-                Toast.makeText(activity, msg, Toast.LENGTH_LONG).show()
-            }
             "initiateRegistrationProcess" -> {
                 // TODO Handle errors without arguments
                 val challenge = call.argument<String>("challenge")!!
@@ -135,7 +128,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         result.addOnSuccessListener { pendingIntent ->
             if (pendingIntent != null) {
                 // Start a FIDO2 registration request.
-                activity.startIntentSenderForResult(
+                activity?.startIntentSenderForResult(
                         pendingIntent.intentSender,
                         REGISTER_REQUEST_CODE,
                         null,
@@ -216,7 +209,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         args["keyHandleBase64"] = keyHandleBase64
         args["clientDataJson"] = clientDataJson
         args["attestationObject"] = attestationObjectBase64
-        channel.invokeMethod("onRegistrationComplete", null)
+        channel.invokeMethod("onRegistrationComplete", args)
     }
 
     // TODO: need to process data and add arguments
@@ -239,6 +232,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     ?: return null
             return Base64.decode(keyHandleBase64, Base64.DEFAULT)
         }
+        return null
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {

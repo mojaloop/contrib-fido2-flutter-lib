@@ -4,9 +4,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class Fido2Client {
-  static const MethodChannel _channel =
-      const MethodChannel('fido2_client');
-
+  MethodChannel _channel = const MethodChannel('fido2_client');
   List<Function> _savedRegistrationListeners = [];
   List<Function> _savedSigningListeners = [];
 
@@ -41,17 +39,6 @@ class Fido2Client {
       default:
         throw ('Method not defined');
     }
-  }
-
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
-
-  static Future<void> showToast(String msg) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('msg', () => msg);
-    await _channel.invokeMethod('showToast', args);
   }
 
   Future<void> initiateRegistrationProcess(String challenge, String userId, String username) async {
