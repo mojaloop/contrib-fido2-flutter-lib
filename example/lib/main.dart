@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:fido2_client/fido2_client.dart';
 
 void main() {
@@ -18,6 +15,8 @@ class _MyAppState extends State<MyApp> {
   String clientData;
   String attestationObj;
   String signature;
+  static final String rpDomain = "mojapay-test-rp.web.app";
+  static final String rpName = "MojapayFido2Demo";
   Fido2Client fidoClient = Fido2Client();
 
   @override
@@ -43,13 +42,14 @@ class _MyAppState extends State<MyApp> {
 
   Widget buildSignButton() {
     return RaisedButton(child: Text('FIDO Sign'), onPressed: () {
-      SigningResultListener signingListener = (String keyHandle, String clientData, String authData, String signature) {
+      SigningResultListener signingListener = (String keyHandle, String clientData, String authData, String signature, String userHandle) {
         this.signature = signature;
         print('Signature: $signature');
-        print('Keyhandle: $keyHandle');
+        print('Key Handle: $keyHandle');
+        print('User handle: $userHandle');
       };
       fidoClient.addSigningResultListener(signingListener);
-      fidoClient.initiateSigningProcess(keyHandle, "transaction12356678");
+      fidoClient.initiateSigningProcess(keyHandle, "transaction12356678", rpDomain);
     },);
   }
 
@@ -64,8 +64,7 @@ class _MyAppState extends State<MyApp> {
         print('Attestation obj: $attestationObj');
       };
       fidoClient.addRegistrationResultListener(regListener);
-      fidoClient.initiateRegistrationProcess("randomchallenge1231321", "kkzeng@edu.uwaterloo.ca", "kkzeng");
-
+      fidoClient.initiateRegistrationProcess("randomchallenge1231321", "kenkaizeng@gmail.com", "kkzeng", rpDomain, rpName);
     },);
   }
 }

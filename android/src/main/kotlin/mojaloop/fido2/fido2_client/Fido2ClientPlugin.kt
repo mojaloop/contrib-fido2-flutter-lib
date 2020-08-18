@@ -42,9 +42,6 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
 
         const val REGISTER_REQUEST_CODE = 1
         const val SIGN_REQUEST_CODE = 2
-        const val RP_DOMAIN = "mojapay-test-rp.web.app"
-        const val RP_NAME = "MojapayFido2"
-        const val KEY_HANDLE_PREF = "KEY_HANDLE_PREF"
     }
     
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -86,12 +83,15 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                 val challenge = call.argument<String>("challenge")!!
                 val userId = call.argument<String>("userId")!!
                 val username = call.argument<String>("username")!!
-                initiateRegistrationProcess(challenge, userId, username)
+                val rpDomain = call.argument<String>("rpDomain")!!
+                val rpName = call.argument<String>("rpName")!!
+                initiateRegistrationProcess(challenge, userId, username, rpDomain, rpName)
             }
             "initiateSigningProcess" -> {
                 val keyHandleBase64 = call.argument<String>("keyHandle")!!
                 val challenge = call.argument<String>("challenge")!!
-                initiateSigningProcess(keyHandleBase64, challenge)
+                val rpDomain = call.argument<String>("rpDomain")!!
+                initiateSigningProcess(keyHandleBase64, challenge, rpDomain)
             }
             else -> {
                 result.notImplemented()
@@ -99,9 +99,8 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateRegistrationProcess(challenge: String, userId: String, username: String) {
-        val rpEntity = PublicKeyCredentialRpEntity(RP_DOMAIN, RP_NAME, null)
-        // All the option parameters should come from the Relying Party / server
+    private fun initiateRegistrationProcess(challenge: String, userId: String, username: String, rpDomain: String, rpName: String) {
+        val rpEntity = PublicKeyCredentialRpEntity(rpDomain, rpName, null)
         val options = PublicKeyCredentialCreationOptions.Builder()
                 .setRp(rpEntity)
                 .setUser(
@@ -143,9 +142,9 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateSigningProcess(keyHandleBase64: String, challenge: String) {
+    private fun initiateSigningProcess(keyHandleBase64: String, challenge: String, rpDomain: String) {
         val options = PublicKeyCredentialRequestOptions.Builder()
-                .setRpId(RP_DOMAIN)
+                .setRpId(rpDomain)
                 .setAllowList(
                         listOf(
                                 PublicKeyCredentialDescriptor(
@@ -220,32 +219,18 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         val clientDataJson = String(response.clientDataJSON, Charsets.UTF_8)
         val authenticatorDataBase64 = Base64.encodeToString(response.authenticatorData, Base64.DEFAULT)
         val signatureBase64 = Base64.encodeToString(response.signature, Base64.DEFAULT)
+        val userHandle = response.userHandle // TODO: Process user handle - user id
 
         val args = HashMap<String, String>();
         args["keyHandle"] = keyHandleBase64
         args["clientDataJson"] = clientDataJson
         args["authData"] = authenticatorDataBase64
         args["signature"] = signatureBase64
+        userHandle?.let {
+            args["userHandle"] = Base64.encodeToString(it, Base64.DEFAULT);
+        }
 
         channel.invokeMethod("onSigningComplete", args)
-    }
-
-    private fun storeKeyHandle(keyHandle: ByteArray) {
-        activity?.let {
-            with(PreferenceManager.getDefaultSharedPreferences(it).edit()) {
-                putString(KEY_HANDLE_PREF, Base64.encodeToString(keyHandle, Base64.DEFAULT))
-                apply()
-            }
-        }
-    }
-
-    private fun loadKeyHandle(): ByteArray? {
-        activity?.let {
-            val keyHandleBase64 = PreferenceManager.getDefaultSharedPreferences(it).getString(KEY_HANDLE_PREF, null)
-                    ?: return null
-            return Base64.decode(keyHandleBase64, Base64.DEFAULT)
-        }
-        return null
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
