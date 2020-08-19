@@ -5,6 +5,12 @@ import 'package:flutter/services.dart';
 typedef RegistrationResultListener = Function(String keyHandle, String clientData, String attestationObj);
 typedef SigningResultListener = Function(String keyHandle, String clientData, String authData, String signature, String userHandle);
 
+class AuthenticatorError implements Exception {
+  String errorName;
+  String errMsg;
+  AuthenticatorError(this.errorName, this.errMsg);
+}
+
 class Fido2Client {
 
   MethodChannel _channel = const MethodChannel('fido2_client');
@@ -31,7 +37,7 @@ class Fido2Client {
         String keyHandleBase64 = args['keyHandle'];
         String clientDataJson = args['clientDataJson'];
         String attestationObj = args['attestationObject'];
-        for (var callback in _savedRegistrationListeners) callback(keyHandleBase64, clientDataJson, attestationObj);
+        for (var listener in _savedRegistrationListeners) listener(keyHandleBase64, clientDataJson, attestationObj);
         break;
       case 'onSigningComplete':
         // WARNING: Do not add generics like Map<String, dynamic> - this causes breaking changes
@@ -41,7 +47,13 @@ class Fido2Client {
         String authenticatorDataBase64 = args['authData'];
         String signatureBase64 = args['signature'];
         String userHandle = args['userHandle'];
-        for (var callback in _savedSigningListeners) callback(keyHandleBase64, clientDataJson, authenticatorDataBase64, signatureBase64, userHandle);
+        for (var listener in _savedSigningListeners) listener(keyHandleBase64, clientDataJson, authenticatorDataBase64, signatureBase64, userHandle);
+        break;
+      case 'onAuthError':
+        Map args = call.arguments;
+        String errorName = args['errorName'];
+        String errorMsg = args['errorMsg'];
+        throw AuthenticatorError(errorName, errorMsg);
         break;
       default:
         throw ('Method not defined');
