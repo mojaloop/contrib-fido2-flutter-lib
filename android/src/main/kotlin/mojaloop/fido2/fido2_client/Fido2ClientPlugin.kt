@@ -79,19 +79,32 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "initiateRegistrationProcess" -> {
-                // TODO Handle errors without arguments
-                val challenge = call.argument<String>("challenge")!!
-                val userId = call.argument<String>("userId")!!
-                val username = call.argument<String>("username")!!
-                val rpDomain = call.argument<String>("rpDomain")!!
-                val rpName = call.argument<String>("rpName")!!
-                initiateRegistrationProcess(challenge, userId, username, rpDomain, rpName)
+                try {
+                    val challenge = call.argument<String>("challenge")!!
+                    val userId = call.argument<String>("userId")!!
+                    val username = call.argument<String>("username")!!
+                    val rpDomain = call.argument<String>("rpDomain")!!
+                    val rpName = call.argument<String>("rpName")!!
+                    initiateRegistrationProcess(result, challenge, userId, username, rpDomain, rpName)
+                }
+                catch (e: NullPointerException) {
+                    val errCode = "MISSING_ARGUMENTS"
+                    val errMsg = "One or more of the arguments provided are null. None of the arguments can be null!"
+                    result.error(errCode, errMsg,null)
+                }
             }
             "initiateSigningProcess" -> {
-                val keyHandleBase64 = call.argument<String>("keyHandle")!!
-                val challenge = call.argument<String>("challenge")!!
-                val rpDomain = call.argument<String>("rpDomain")!!
-                initiateSigningProcess(keyHandleBase64, challenge, rpDomain)
+                try {
+                    val keyHandleBase64 = call.argument<String>("keyHandle")!!
+                    val challenge = call.argument<String>("challenge")!!
+                    val rpDomain = call.argument<String>("rpDomain")!!
+                    initiateSigningProcess(result, keyHandleBase64, challenge, rpDomain)
+                }
+                catch (e: NullPointerException) {
+                    val errCode = "MISSING_ARGUMENTS"
+                    val errMsg = "One or more of the arguments provided are null. None of the arguments can be null!"
+                    result.error(errCode, errMsg,null)
+                }
             }
             else -> {
                 result.notImplemented()
@@ -99,7 +112,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateRegistrationProcess(challenge: String, userId: String, username: String, rpDomain: String, rpName: String) {
+    private fun initiateRegistrationProcess(result: Result, challenge: String, userId: String, username: String, rpDomain: String, rpName: String) {
         val rpEntity = PublicKeyCredentialRpEntity(rpDomain, rpName, null)
         val options = PublicKeyCredentialCreationOptions.Builder()
                 .setRp(rpEntity)
@@ -123,8 +136,8 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                 .build()
 
         val fidoClient = Fido.getFido2ApiClient(activity)
-        val result = fidoClient.getRegisterPendingIntent(options)
-        result.addOnSuccessListener { pendingIntent ->
+        val registerIntent = fidoClient.getRegisterPendingIntent(options)
+        registerIntent.addOnSuccessListener { pendingIntent ->
             if (pendingIntent != null) {
                 // Start a FIDO2 registration request.
                 activity?.startIntentSenderForResult(
@@ -137,12 +150,13 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
             }
         }
 
-        result.addOnFailureListener {
-            // TODO: Add on failure
+        registerIntent.addOnFailureListener {
+            val errCode = "FAILED_TO_GET_REGISTER_INTENT"
+            result.error(errCode, it.message, null);
         }
     }
 
-    private fun initiateSigningProcess(keyHandleBase64: String, challenge: String, rpDomain: String) {
+    private fun initiateSigningProcess(result: Result, keyHandleBase64: String, challenge: String, rpDomain: String) {
         val options = PublicKeyCredentialRequestOptions.Builder()
                 .setRpId(rpDomain)
                 .setAllowList(
@@ -158,8 +172,8 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                 .build()
 
         val fidoClient = Fido.getFido2ApiClient(activity)
-        val result = fidoClient.getSignPendingIntent(options)
-        result.addOnSuccessListener { pendingIntent ->
+        val signingIntent = fidoClient.getSignPendingIntent(options)
+        signingIntent.addOnSuccessListener { pendingIntent ->
             if(pendingIntent != null) {
                 activity?.startIntentSenderForResult(pendingIntent.intentSender,
                         SIGN_REQUEST_CODE,
@@ -170,8 +184,9 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
             }
         }
 
-        result.addOnFailureListener {
-            // TODO: Add on failure
+        signingIntent.addOnFailureListener {
+            val errCode = "FAILED_TO_GET_SIGNING_INTENT"
+            result.error(errCode, it.message, null);
         }
     }
 
@@ -180,7 +195,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
             RESULT_OK -> {
                 data?.let {
                     if (it.hasExtra(Fido.FIDO2_KEY_ERROR_EXTRA)) {
-                        //handleErrorResponse(data.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA))
+                        handleErrorResponse(data.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA))
                     } else if (it.hasExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)) {
                         val fido2Response = data.getByteArrayExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)
                         when (requestCode) {
@@ -191,20 +206,39 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                 }
             }
             RESULT_CANCELED -> {
-                // TODO: Handle
+                val errorName = "FIDO_PROCESS_INTERRUPTED"
+                val errorMessage = "The authentication process was interrupted before the user could complete verification."
+
+                val args = HashMap<String, String>()
+                args["errorName"] = errorName
+                args["errorMsg"] = errorMessage
+
+                channel.invokeMethod("onAuthError", args)
             }
         }
         return true
     }
 
-    // TODO: need to process data and add arguments
+    private fun handleErrorResponse(errorBytes: ByteArray) {
+        val authenticatorErrorResponse = AuthenticatorErrorResponse.deserializeFromBytes(errorBytes)
+        val errorName = authenticatorErrorResponse.errorCode.name
+        val errorMessage = authenticatorErrorResponse.errorMessage ?: ""
+
+        val args = HashMap<String, String>()
+        args["errorName"] = errorName
+        args["errorMsg"] = errorMessage
+
+        channel.invokeMethod("onAuthError", args)
+    }
+
+
     private fun processRegisterResponse(fidoResponse: ByteArray) {
         val response = AuthenticatorAttestationResponse.deserializeFromBytes(fidoResponse)
         val keyHandleBase64 = Base64.encodeToString(response.keyHandle, Base64.DEFAULT)
         val clientDataJson = String(response.clientDataJSON, Charsets.UTF_8)
         val attestationObjectBase64 = Base64.encodeToString(response.attestationObject, Base64.DEFAULT)
 
-        val args = HashMap<String, String>();
+        val args = HashMap<String, String>()
         args["keyHandle"] = keyHandleBase64
         args["clientDataJson"] = clientDataJson
         args["attestationObject"] = attestationObjectBase64
@@ -212,14 +246,13 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         channel.invokeMethod("onRegistrationComplete", args)
     }
 
-    // TODO: need to process data and add arguments
     private fun processSigningResponse(fidoResponse: ByteArray) {
         val response = AuthenticatorAssertionResponse.deserializeFromBytes(fidoResponse)
         val keyHandleBase64 = Base64.encodeToString(response.keyHandle, Base64.DEFAULT)
         val clientDataJson = String(response.clientDataJSON, Charsets.UTF_8)
         val authenticatorDataBase64 = Base64.encodeToString(response.authenticatorData, Base64.DEFAULT)
         val signatureBase64 = Base64.encodeToString(response.signature, Base64.DEFAULT)
-        val userHandle = response.userHandle // TODO: Process user handle - user id
+        val userHandle = response.userHandle
 
         val args = HashMap<String, String>();
         args["keyHandle"] = keyHandleBase64
