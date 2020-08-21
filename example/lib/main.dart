@@ -15,8 +15,8 @@ class _MyAppState extends State<MyApp> {
   String clientData;
   String attestationObj;
   String signature;
-  static final String rpDomain = "mojapay-test-rp.web.app";
-  static final String rpName = "MojapayFido2Demo";
+  static final String rpDomain = "webauthn-server-demo.herokuapp.com";
+  static final String rpName = "Fido2ClientDemo";
   Fido2Client fidoClient = Fido2Client();
 
   @override

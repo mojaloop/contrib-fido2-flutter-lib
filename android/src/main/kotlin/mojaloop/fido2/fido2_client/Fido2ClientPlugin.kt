@@ -200,13 +200,13 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     // TODO: need to process data and add arguments
     private fun processRegisterResponse(fidoResponse: ByteArray) {
         val response = AuthenticatorAttestationResponse.deserializeFromBytes(fidoResponse)
-        val keyHandleBase64 = Base64.encodeToString(response.keyHandle, Base64.DEFAULT)
-        val clientDataJson = String(response.clientDataJSON, Charsets.UTF_8)
-        val attestationObjectBase64 = Base64.encodeToString(response.attestationObject, Base64.DEFAULT)
+        val keyHandleBase64 = response.keyHandle.toBase64()
+        val clientDataJsonBase64 = response.clientDataJSON.toBase64()
+        val attestationObjectBase64 = response.attestationObject.toBase64()
 
         val args = HashMap<String, String>();
         args["keyHandle"] = keyHandleBase64
-        args["clientDataJson"] = clientDataJson
+        args["clientDataJson"] = clientDataJsonBase64
         args["attestationObject"] = attestationObjectBase64
 
         channel.invokeMethod("onRegistrationComplete", args)
@@ -215,10 +215,10 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     // TODO: need to process data and add arguments
     private fun processSigningResponse(fidoResponse: ByteArray) {
         val response = AuthenticatorAssertionResponse.deserializeFromBytes(fidoResponse)
-        val keyHandleBase64 = Base64.encodeToString(response.keyHandle, Base64.DEFAULT)
-        val clientDataJson = String(response.clientDataJSON, Charsets.UTF_8)
-        val authenticatorDataBase64 = Base64.encodeToString(response.authenticatorData, Base64.DEFAULT)
-        val signatureBase64 = Base64.encodeToString(response.signature, Base64.DEFAULT)
+        val keyHandleBase64 = response.keyHandle.toBase64()
+        val clientDataJson = response.clientDataJSON.toBase64()
+        val authenticatorDataBase64 = response.authenticatorData.toBase64()
+        val signatureBase64 = response.signature.toBase64()
         val userHandle = response.userHandle // TODO: Process user handle - user id
 
         val args = HashMap<String, String>();
@@ -227,7 +227,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         args["authData"] = authenticatorDataBase64
         args["signature"] = signatureBase64
         userHandle?.let {
-            args["userHandle"] = Base64.encodeToString(it, Base64.DEFAULT);
+            args["userHandle"] = it.toBase64()
         }
 
         channel.invokeMethod("onSigningComplete", args)
