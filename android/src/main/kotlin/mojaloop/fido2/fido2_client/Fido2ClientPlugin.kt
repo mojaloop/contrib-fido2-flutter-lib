@@ -118,13 +118,13 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                 .setRp(rpEntity)
                 .setUser(
                         PublicKeyCredentialUserEntity(
-                                userId.toByteArray(),
+                                userId.decodeBase64(),
                                 userId,
                                 null,
                                 username
                         )
                 )
-                .setChallenge(challenge.toByteArray())
+                .setChallenge(challenge.decodeBase64())
                 .setParameters(
                         listOf(
                                 PublicKeyCredentialParameters(
@@ -148,6 +148,9 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                         0,
                         0)
             }
+            else {
+                // TODO: Handle error
+            }
         }
 
         registerIntent.addOnFailureListener {
@@ -168,7 +171,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                                 )
                         )
                 )
-                .setChallenge(challenge.toByteArray())
+                .setChallenge(challenge.decodeBase64())
                 .build()
 
         val fidoClient = Fido.getFido2ApiClient(activity)
@@ -181,6 +184,9 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                         0,
                         0,
                         0)
+            }
+            else {
+                // TODO: Handle error
             }
         }
 
