@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fido2_client/fido2_client.dart';
+import 'package:fido2_client/registration_result.dart';
+import 'package:fido2_client/signing_result.dart';
 
 void main() {
   runApp(MyApp());
@@ -53,29 +55,25 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget buildRegButton() {
-    return RaisedButton(child: Text('FIDO Register'), onPressed: () {
-      RegistrationResultListener regListener = (String keyHandle, String clientData, String attestationObj) {
-        setState(() {
-          this.keyHandle = keyHandle;
-          displayText = 'Challenge: \n$regChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n$clientData\n\nAttestation obj: \n$attestationObj';
-        });
-        print(displayText);
-      };
-      fidoClient.addRegistrationResultListener(regListener);
-      fidoClient.initiateRegistrationProcess(regChallenge, "kenkaizeng@gmail.com", "kkzeng", rpDomain, rpName, -7);
+    return RaisedButton(child: Text('FIDO Register'), onPressed: () async {
+      print("before await");
+      RegistrationResult res = await fidoClient.initiateRegistrationProcess(regChallenge, "kenkaizeng@gmail.com", "kkzeng", rpDomain, rpName, -7);
+      print("after await");
+      setState(() {
+        this.keyHandle = res.keyHandle;
+        displayText = 'Challenge: \n$regChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n${res.clientData}\n\nAttestation obj: \n${res.attestationObj}';
+      });
+      print(displayText);
     },);
   }
 
   Widget buildSignButton() {
-    return RaisedButton(child: Text('FIDO Sign'), onPressed:  keyHandle == null ? null : () {
-      SigningResultListener signingListener = (String keyHandle, String clientData, String authData, String signature, String userHandle) {
-        setState(() {
-          displayText = 'Challenge: \n$signChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n$clientData\n\nauthData: \n$authData\n\nSignature: \n$signature';
-        });
-        print(displayText);
-      };
-      fidoClient.addSigningResultListener(signingListener);
-      fidoClient.initiateSigningProcess(keyHandle, signChallenge, rpDomain);
+    return RaisedButton(child: Text('FIDO Sign'), onPressed:  keyHandle == null ? null : () async {
+      SigningResult res = await fidoClient.initiateSigningProcess(keyHandle, signChallenge, rpDomain);
+      setState(() {
+        displayText = 'Challenge: \n$signChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n${res.clientData}\n\nauthData: \n${res.authData}\n\nSignature: \n${res.signature}';
+      });
+      print(displayText);
     },);
   }
 }
