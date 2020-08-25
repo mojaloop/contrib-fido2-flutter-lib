@@ -56,9 +56,7 @@ class _MyAppState extends State<MyApp> {
 
   Widget buildRegButton() {
     return RaisedButton(child: Text('FIDO Register'), onPressed: () async {
-      print("before await");
-      RegistrationResult res = await fidoClient.initiateRegistrationProcess(regChallenge, "kenkaizeng@gmail.com", "kkzeng", rpDomain, rpName, -7);
-      print("after await");
+      RegistrationResult res = await fidoClient.initiateRegistration(regChallenge, "kenkaizeng@gmail.com", "kkzeng", rpDomain, rpName, -7);
       setState(() {
         this.keyHandle = res.keyHandle;
         displayText = 'Challenge: \n$regChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n${res.clientData}\n\nAttestation obj: \n${res.attestationObj}';
@@ -69,7 +67,7 @@ class _MyAppState extends State<MyApp> {
 
   Widget buildSignButton() {
     return RaisedButton(child: Text('FIDO Sign'), onPressed:  keyHandle == null ? null : () async {
-      SigningResult res = await fidoClient.initiateSigningProcess(keyHandle, signChallenge, rpDomain);
+      SigningResult res = await fidoClient.initiateSigning(keyHandle, signChallenge, rpDomain);
       setState(() {
         displayText = 'Challenge: \n$signChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n${res.clientData}\n\nauthData: \n${res.authData}\n\nSignature: \n${res.signature}';
       });

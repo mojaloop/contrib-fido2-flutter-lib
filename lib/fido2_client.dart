@@ -10,8 +10,8 @@ class Fido2Client {
 
   MethodChannel _channel = const MethodChannel('fido2_client');
 
-  Completer _regCompleter = Completer();
-  Completer _signCompleter = Completer();
+  Completer<RegistrationResult> _regCompleter = Completer();
+  Completer<SigningResult> _signCompleter = Completer();
 
   Fido2Client() {
     _channel.setMethodCallHandler(_handleMethod);
@@ -56,7 +56,7 @@ class Fido2Client {
     }
   }
 
-  Future<dynamic> initiateRegistrationProcess(String challenge, String userId, String username, String rpDomain, String rpName, int coseAlgoValue) async {
+  Future<RegistrationResult> initiateRegistration(String challenge, String userId, String username, String rpDomain, String rpName, int coseAlgoValue) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('userId', () => userId);
@@ -64,16 +64,16 @@ class Fido2Client {
     args.putIfAbsent('rpDomain', () => rpDomain);
     args.putIfAbsent('rpName', () => rpName);
     args.putIfAbsent('coseAlgoValue', () => coseAlgoValue);
-    _channel.invokeMethod('initiateRegistrationProcess', args);
+    _channel.invokeMethod('initiateRegistration', args);
     return _regCompleter.future;
   }
 
-  Future<dynamic> initiateSigningProcess(String keyHandle, String challenge, String rpDomain) async {
+  Future<SigningResult> initiateSigning(String keyHandle, String challenge, String rpDomain) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('keyHandle', () => keyHandle);
     args.putIfAbsent('rpDomain', () => rpDomain);
-    _channel.invokeMethod('initiateSigningProcess', args);
+    _channel.invokeMethod('initiateSigning', args);
     return _signCompleter.future;
   }
 }

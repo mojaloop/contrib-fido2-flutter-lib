@@ -78,7 +78,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
-            "initiateRegistrationProcess" -> {
+            "initiateRegistration" -> {
                 try {
                     val challenge = call.argument<String>("challenge")!!
                     val userId = call.argument<String>("userId")!!
@@ -86,7 +86,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     val rpDomain = call.argument<String>("rpDomain")!!
                     val rpName = call.argument<String>("rpName")!!
                     val coseAlgoValue = call.argument<Int>("coseAlgoValue")!!
-                    initiateRegistrationProcess(result, challenge, userId, username, rpDomain, rpName, coseAlgoValue)
+                    initiateRegistration(result, challenge, userId, username, rpDomain, rpName, coseAlgoValue)
                 }
                 catch (e: NullPointerException) {
                     val errCode = "MISSING_ARGUMENTS"
@@ -94,12 +94,12 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     result.error(errCode, errMsg,null)
                 }
             }
-            "initiateSigningProcess" -> {
+            "initiateSigning" -> {
                 try {
                     val keyHandleBase64 = call.argument<String>("keyHandle")!!
                     val challenge = call.argument<String>("challenge")!!
                     val rpDomain = call.argument<String>("rpDomain")!!
-                    initiateSigningProcess(result, keyHandleBase64, challenge, rpDomain)
+                    initiateSigning(result, keyHandleBase64, challenge, rpDomain)
                 }
                 catch (e: NullPointerException) {
                     val errCode = "MISSING_ARGUMENTS"
@@ -113,7 +113,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateRegistrationProcess(result: Result, challenge: String, userId: String, username: String, rpDomain: String, rpName: String, coseAlgoValue: Int) {
+    private fun initiateRegistration(result: Result, challenge: String, userId: String, username: String, rpDomain: String, rpName: String, coseAlgoValue: Int) {
         val rpEntity = PublicKeyCredentialRpEntity(rpDomain, rpName, null)
         val options = PublicKeyCredentialCreationOptions.Builder()
                 .setRp(rpEntity)
@@ -160,7 +160,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateSigningProcess(result: Result, keyHandleBase64: String, challenge: String, rpDomain: String) {
+    private fun initiateSigning(result: Result, keyHandleBase64: String, challenge: String, rpDomain: String) {
         val options = PublicKeyCredentialRequestOptions.Builder()
                 .setRpId(rpDomain)
                 .setAllowList(
