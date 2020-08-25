@@ -85,7 +85,8 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     val username = call.argument<String>("username")!!
                     val rpDomain = call.argument<String>("rpDomain")!!
                     val rpName = call.argument<String>("rpName")!!
-                    initiateRegistrationProcess(result, challenge, userId, username, rpDomain, rpName)
+                    val coseAlgoValue = call.argument<Int>("coseAlgoValue")!!
+                    initiateRegistrationProcess(result, challenge, userId, username, rpDomain, rpName, coseAlgoValue)
                 }
                 catch (e: NullPointerException) {
                     val errCode = "MISSING_ARGUMENTS"
@@ -112,7 +113,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateRegistrationProcess(result: Result, challenge: String, userId: String, username: String, rpDomain: String, rpName: String) {
+    private fun initiateRegistrationProcess(result: Result, challenge: String, userId: String, username: String, rpDomain: String, rpName: String, coseAlgoValue: Int) {
         val rpEntity = PublicKeyCredentialRpEntity(rpDomain, rpName, null)
         val options = PublicKeyCredentialCreationOptions.Builder()
                 .setRp(rpEntity)
@@ -129,7 +130,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                         listOf(
                                 PublicKeyCredentialParameters(
                                         PublicKeyCredentialType.PUBLIC_KEY.toString(),
-                                        EC2Algorithm.ES256.algoValue
+                                        coseAlgoValue
                                 )
                         )
                 )
@@ -201,7 +202,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
             RESULT_OK -> {
                 data?.let {
                     if (it.hasExtra(Fido.FIDO2_KEY_ERROR_EXTRA)) {
-                        handleErrorResponse(data.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA))
+                        handleErrorResponse(requestCode, data.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA))
                     } else if (it.hasExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)) {
                         val fido2Response = data.getByteArrayExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)
                         when (requestCode) {
@@ -219,13 +220,16 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                 args["errorName"] = errorName
                 args["errorMsg"] = errorMessage
 
-                channel.invokeMethod("onAuthError", args)
+                when (requestCode) {
+                    REGISTER_REQUEST_CODE -> channel.invokeMethod("onRegAuthError", args)
+                    SIGN_REQUEST_CODE -> channel.invokeMethod("onSignAuthError", args)
+                }
             }
         }
         return true
     }
 
-    private fun handleErrorResponse(errorBytes: ByteArray) {
+    private fun handleErrorResponse(requestCode: Int, errorBytes: ByteArray) {
         val authenticatorErrorResponse = AuthenticatorErrorResponse.deserializeFromBytes(errorBytes)
         val errorName = authenticatorErrorResponse.errorCode.name
         val errorMessage = authenticatorErrorResponse.errorMessage ?: ""

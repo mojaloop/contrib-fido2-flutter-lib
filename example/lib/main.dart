@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> {
         print(displayText);
       };
       fidoClient.addRegistrationResultListener(regListener);
-      fidoClient.initiateRegistrationProcess(regChallenge, "kenkaizeng@gmail.com", "kkzeng", rpDomain, rpName);
+      fidoClient.initiateRegistrationProcess(regChallenge, "kenkaizeng@gmail.com", "kkzeng", rpDomain, rpName, -7);
     },);
   }
 
