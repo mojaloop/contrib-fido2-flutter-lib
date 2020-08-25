@@ -1,3 +1,4 @@
+// Corresponds to AuthenticatorAssertionResponse
 class SigningResult {
   SigningResult(this.keyHandle, this.clientData, this.authData, this.signature, this.userHandle);
 

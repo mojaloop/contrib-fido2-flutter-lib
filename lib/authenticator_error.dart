@@ -1,3 +1,4 @@
+// Corresponds to AuthenticatorErrorResponse
 class AuthenticatorError implements Exception {
   String errorName;
   String errMsg;

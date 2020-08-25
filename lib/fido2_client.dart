@@ -6,16 +6,19 @@ import 'package:flutter/services.dart';
 
 import 'authenticator_error.dart';
 
-
 class Fido2Client {
 
   MethodChannel _channel = const MethodChannel('fido2_client');
-  Completer _regCompleter = Completer();
-  Completer _signingCompleter = Completer();
+  Function(RegistrationResult) _regCompletionCallback;
+  Function(SigningResult) _signingCompletionCallback;
 
   Fido2Client() {
     _channel.setMethodCallHandler(_handleMethod);
   }
+
+  void registerRegistrationCompletionCallback(Function(RegistrationResult) callback) => _regCompletionCallback = callback;
+
+  void registerSigningCompletionHandler(Function(SigningResult) callback) => _signingCompletionCallback = callback;
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
@@ -25,8 +28,8 @@ class Fido2Client {
         String keyHandleBase64 = args['keyHandle'];
         String clientDataJson = args['clientDataJson'];
         String attestationObj = args['attestationObject'];
-        RegistrationResult res = RegistrationResult(keyHandleBase64, clientDataJson, attestationObj);
-        _regCompleter.complete(res);
+        RegistrationResult res = RegistrationResult(keyHandleBase64, clientDataJson, attestationObj)
+        _regCompletionCallback(res);
         break;
       case 'onSigningComplete':
         // WARNING: Do not add generics like Map<String, dynamic> - this causes breaking changes
@@ -37,26 +40,26 @@ class Fido2Client {
         String signatureBase64 = args['signature'];
         String userHandle = args['userHandle'];
         SigningResult res = SigningResult(keyHandleBase64, clientDataJson, authenticatorDataBase64, signatureBase64, userHandle);
-        _signingCompleter.complete(res);
+        _signingCompletionCallback(res);
         break;
       case 'onRegAuthError':
         Map args = call.arguments;
         String errorName = args['errorName'];
         String errorMsg = args['errorMsg'];
-        _regCompleter.completeError(AuthenticatorError(errorName, errorMsg));
+        throw(AuthenticatorError(errorName, errorMsg));
         break;
       case 'onSignAuthError':
         Map args = call.arguments;
         String errorName = args['errorName'];
         String errorMsg = args['errorMsg'];
-        _signingCompleter.completeError(AuthenticatorError(errorName, errorMsg));
+        throw(AuthenticatorError(errorName, errorMsg));
         break;
       default:
         throw ('Method not defined');
     }
   }
 
-  Future<RegistrationResult> initiateRegistrationProcess(String challenge, String userId, String username, String rpDomain, String rpName, int coseAlgoValue) async {
+  Future<void> initiateRegistrationProcess(String challenge, String userId, String username, String rpDomain, String rpName, int coseAlgoValue) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('userId', () => userId);
@@ -65,15 +68,13 @@ class Fido2Client {
     args.putIfAbsent('rpName', () => rpName);
     args.putIfAbsent('coseAlgoValue', () => coseAlgoValue);
     await _channel.invokeMethod('initiateRegistrationProcess', args);
-    return _regCompleter.future;
   }
 
-  Future<SigningResult> initiateSigningProcess(String keyHandle, String challenge, String rpDomain) async {
+  Future<void> initiateSigningProcess(String keyHandle, String challenge, String rpDomain) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('keyHandle', () => keyHandle);
     args.putIfAbsent('rpDomain', () => rpDomain);
     await _channel.invokeMethod('initiateSigningProcess', args);
-    return _signingCompleter.future;
   }
 }

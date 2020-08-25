@@ -1,3 +1,4 @@
+// Corresponds to AuthenticatorAttestationResponse
 class RegistrationResult {
   RegistrationResult(this.keyHandle, this.clientData, this.attestationObj);
   String keyHandle;
