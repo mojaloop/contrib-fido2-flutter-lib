@@ -10,6 +10,7 @@ class Fido2Client {
 
   MethodChannel _channel = const MethodChannel('fido2_client');
 
+  // Used to produce and complete Futures for each process
   Completer<RegistrationResult> _regCompleter = Completer();
   Completer<SigningResult> _signCompleter = Completer();
 
@@ -56,7 +57,35 @@ class Fido2Client {
     }
   }
 
-  Future<RegistrationResult> initiateRegistration(String challenge, String userId, String username, String rpDomain, String rpName, int coseAlgoValue) async {
+  /// Begins the FIDO registration process.
+  ///
+  /// This launches the FIDO client which authenticates the user associated with [userId]
+  /// and [username] via lock screen (which may have biometric or PIN methods) or
+  /// even external authenticators.
+  ///
+  /// The [rpDomain] and [rpName] describe the Relying Party's
+  /// domain and name.
+  /// See: https://www.w3.org/TR/webauthn/#webauthn-relying-party
+  ///
+  /// e.g.
+  /// rpDomain: webauthn-demo-server.com
+  /// rpName: Webauthn Demo Server
+  ///
+  /// The [challenge] is used validation purposes by the WebAuthn server.
+  ///
+  /// [coseAlgoValue] is the COSE identifier for the cryptographic algorithm that will be
+  /// used by the authenticator for keypair generation.
+  /// See: https://www.iana.org/assignments/cose/cose.xhtml
+  ///
+  /// The method returns a [RegistrationResult] future that is completed after the
+  /// user completes the authentication process.
+  Future<RegistrationResult> initiateRegistration(
+      String challenge,
+      String userId,
+      String username,
+      String rpDomain,
+      String rpName,
+      int coseAlgoValue) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('userId', () => userId);
@@ -68,7 +97,27 @@ class Fido2Client {
     return _regCompleter.future;
   }
 
-  Future<SigningResult> initiateSigning(String keyHandle, String challenge, String rpDomain) async {
+  /// Begins the FIDO signing process.
+  ///
+  /// This launches the FIDO client which authenticates the user whose credentials
+  /// were previously registered and are associated with the credential identifier
+  /// [keyHandle]. This [keyHandle] should match the one produced in the registration
+  /// phase for the same user ([RegistrationResult.keyHandle]).
+  ///
+  /// The [challenge] is signed by the private key that the FIDO client created
+  /// during registration. The [SigningResult.signature] produced will be used
+  /// for user verification purposes.
+  ///
+  /// The [rpDomain] describes the Relying Party's domain.
+  /// e.g. rpDomain: webauthn-demo-server.com
+  /// See: https://www.w3.org/TR/webauthn/#webauthn-relying-party
+  ///
+  /// The method returns a [SigningResult] future that is completed after the
+  /// user completes the authentication process.
+  Future<SigningResult> initiateSigning(
+      String keyHandle,
+      String challenge,
+      String rpDomain) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('keyHandle', () => keyHandle);
