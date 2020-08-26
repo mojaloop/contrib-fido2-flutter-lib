@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:fido2_client/fido2_client.dart';
 import 'package:fido2_client/registration_result.dart';
@@ -59,7 +62,12 @@ class _MyAppState extends State<MyApp> {
       RegistrationResult res = await fidoClient.initiateRegistration(regChallenge, "kenkaizeng@gmail.com", "kkzeng", rpDomain, rpName, -7);
       setState(() {
         this.keyHandle = res.keyHandle;
-        displayText = 'Challenge: \n$regChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n${res.clientData}\n\nAttestation obj: \n${res.attestationObj}';
+
+        // Decoding the clientData to be JSON so that it is human readable
+        Uint8List decodedClientData = base64Url.decode(res.clientData);
+        String jsonFormat = utf8.decode(decodedClientData);
+
+        displayText = 'Challenge: \n$regChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n$jsonFormat\n\nAttestation obj: \n${res.attestationObj}';
       });
       print(displayText);
     },);
@@ -69,7 +77,11 @@ class _MyAppState extends State<MyApp> {
     return RaisedButton(child: Text('FIDO Sign'), onPressed:  keyHandle == null ? null : () async {
       SigningResult res = await fidoClient.initiateSigning(keyHandle, signChallenge, rpDomain);
       setState(() {
-        displayText = 'Challenge: \n$signChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n${res.clientData}\n\nauthData: \n${res.authData}\n\nSignature: \n${res.signature}';
+        // Decoding the clientData to be JSON so that it is human readable
+        Uint8List decodedClientData = base64Url.decode(res.clientData);
+        String jsonFormat = utf8.decode(decodedClientData);
+
+        displayText = 'Challenge: \n$signChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n$jsonFormat\n\nauthData: \n${res.authData}\n\nSignature: \n${res.signature}';
       });
       print(displayText);
     },);
