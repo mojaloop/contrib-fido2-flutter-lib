@@ -71,6 +71,9 @@ class Fido2Client {
   /// rpDomain: webauthn-demo-server.com
   /// rpName: Webauthn Demo Server
   ///
+  /// Note that the RP domain must be hosting an assetlinks.json file.
+  /// See: https://developers.google.com/identity/fido/android/native-apps#interoperability_with_your_website
+  ///
   /// The [challenge] is used validation purposes by the WebAuthn server.
   ///
   /// [coseAlgoValue] is the COSE identifier for the cryptographic algorithm that will be
@@ -104,6 +107,7 @@ class Fido2Client {
   /// [keyHandle]. This [keyHandle] should match the one produced in the registration
   /// phase for the same user ([RegistrationResult.keyHandle]).
   ///
+  ///
   /// The [challenge] is signed by the private key that the FIDO client created
   /// during registration. The [SigningResult.signature] produced will be used
   /// for user verification purposes.
@@ -111,6 +115,9 @@ class Fido2Client {
   /// The [rpDomain] describes the Relying Party's domain.
   /// e.g. rpDomain: webauthn-demo-server.com
   /// See: https://www.w3.org/TR/webauthn/#webauthn-relying-party
+  ///
+  /// Note that the RP domain must be hosting an assetlinks.json file.
+  /// See: https://developers.google.com/identity/fido/android/native-apps#interoperability_with_your_website
   ///
   /// The method returns a [SigningResult] future that is completed after the
   /// user completes the authentication process.
