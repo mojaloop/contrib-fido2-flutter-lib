@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:fido2_client/registration_result.dart';
 import 'package:fido2_client/signing_result.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'authenticator_error.dart';
 
 class Fido2Client {
-
   MethodChannel _channel = const MethodChannel('fido2_client');
 
   // Used to produce and complete Futures for each process
@@ -26,7 +24,8 @@ class Fido2Client {
         String keyHandleBase64 = args['keyHandle'];
         String clientDataJson = args['clientDataJson'];
         String attestationObj = args['attestationObject'];
-        RegistrationResult res = RegistrationResult(keyHandleBase64, clientDataJson, attestationObj);
+        RegistrationResult res =
+            RegistrationResult(keyHandleBase64, clientDataJson, attestationObj);
         _regCompleter.complete(res);
         break;
       case 'onSigningComplete':
@@ -37,7 +36,8 @@ class Fido2Client {
         String authenticatorDataBase64 = args['authData'];
         String signatureBase64 = args['signature'];
         String userHandle = args['userHandle'];
-        SigningResult res = SigningResult(keyHandleBase64, clientDataJson, authenticatorDataBase64, signatureBase64, userHandle);
+        SigningResult res = SigningResult(keyHandleBase64, clientDataJson,
+            authenticatorDataBase64, signatureBase64, userHandle);
         _signCompleter.complete(res);
         break;
       case 'onRegAuthError':
@@ -122,9 +122,7 @@ class Fido2Client {
   /// The method returns a [SigningResult] future that is completed after the
   /// user completes the authentication process.
   Future<SigningResult> initiateSigning(
-      String keyHandle,
-      String challenge,
-      String rpDomain) async {
+      String keyHandle, String challenge, String rpDomain) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('keyHandle', () => keyHandle);
