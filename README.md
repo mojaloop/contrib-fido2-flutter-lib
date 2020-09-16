@@ -61,11 +61,11 @@ Inputs:
 | rpName          | String | The name of the Relying Party                                                |
 | coseAlgoValue** | int    | The unique COSE identifier for the algorithm to be used by the authenticator |
 
-/* A Relying Party refers to the party on whose behalf the authentication ceremony is being performed. 
+\* A Relying Party refers to the party on whose behalf the authentication ceremony is being performed. 
 You can view the formal definition [here](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
 For example, if you were using this for a mobile app with a web server backend, then the web server would be the Relying Party.
 
-/** See the supported algorithms: [EC2 algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/EC2Algorithm) and [RSA algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/RSAAlgorithm)
+\*\* See the supported algorithms: [EC2 algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/EC2Algorithm) and [RSA algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/RSAAlgorithm)
 
 These 2 links will give you the supported descriptions of the supported algorithms e.g. 'ECDSA w/ SHA-256'.
 
@@ -109,10 +109,38 @@ The output will be in the form of a `SigningResult` model object with the follow
 
 This corresponds to the `AuthenticatorAssertionResponse` in the WebAuthn spec.
 
-### Hosting assetlinks.json file
+### Hosting assetlinks.json (VERY IMPORTANT!)
 
+This step is very important! Without this, the plugin will not work. By hosting the file that these instructions will teach you, your server is making a public statement about sharing credentials with your Flutter app.
+
+1. Generate your app's SHA256 fingerprint by following the steps [here](https://developers.google.com/android/guides/client-auth)
+2. In the JSON file below, replace "app sha256 fingerprint" with your app's SHA256 fingerprint.
+
+`assetlinks.json`
+
+```
+[
+  {
+    "relation" : [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target" : {
+      "namespace" : "android_app",
+      "package_name" : "com.example.android",
+      "sha256_cert_fingerprints" : [
+         "app sha256 fingerprint"
+      ]
+    }
+  }
+]
+```
+
+3. Host the JSON file at https://example.com/.well-known/assetlinks.json, replacing example with your domain.
 
 ## Example code from my repo
+
+## Common Issues
 
 ## External resources for FIDO
 
