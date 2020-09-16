@@ -36,7 +36,7 @@ The next time that the server wants to authenticate a user, they send a challeng
 
 For more information: [insert link to external resource]()
 
-## Quick Start Guide
+## How to use
 
 There are 2 functions that are exposed to the user, each corresponding to a phase of the FIDO2 process:
 
@@ -44,27 +44,79 @@ There are 2 functions that are exposed to the user, each corresponding to a phas
 
 (2) `initiateSigning`
 
-It is fairly straightforward to understand the purpose of these functions - you call each of these functions whenever you want to register a new credential or you want to authenticate a user via signing.
+It is fairly straightforward to understand the purpose of these functions. However, the inputs and outputs of these functions may be confusing. 
 
-What is not so straightforward are the parameters.
+Here is an explanation of the inputs and outputs of the above functions:
 
-For registration:
+### `initiateRegistration`
 
-String challenge - the
-String userId - The identifier of the user you are trying to register a credential for.
-String username - The username of the user you are trying to register a credential for.
-String rpDomain - The domain of the Relying Party
-String rpName - The name of the Relying Party.
-int coseAlgoValue - The COSE identifier for the algorithm that you are trying to use.
+Inputs:
 
-List of possible coseAlgoValues:
+| variable        | type   | description                                                                  |
+|-----------------|--------|------------------------------------------------------------------------------|
+| challenge       | String | The string given by the server                                               |
+| userId          | String | The identifier of the user you are registering a credential for              |
+| username        | String | The name of the user you are registering a credential for                    |
+| rpDomain        | String | The domain of the Relying Party*                                             |
+| rpName          | String | The name of the Relying Party                                                |
+| coseAlgoValue** | int    | The unique COSE identifier for the algorithm to be used by the authenticator |
 
-For signing:
+/* A Relying Party refers to the party on whose behalf the authentication ceremony is being performed. 
+You can view the formal definition [here](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
+For example, if you were using this for a mobile app with a web server backend, then the web server would be the Relying Party.
 
-String keyHandle - The identifier for the credential you generated previously. Should be the same 
-String challenge
-String rpDomain
+/** See the supported algorithms: [EC2 algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/EC2Algorithm) and [RSA algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/RSAAlgorithm)
 
-## Hosting assetlinks.json file
+These 2 links will give you the supported descriptions of the supported algorithms e.g. 'ECDSA w/ SHA-256'.
+
+You can search for the algorithm identifier using the following links: [COSE registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms) and [WebAuthn registry](https://www.w3.org/TR/webauthn/#sctn-cose-alg-reg).
+
+You will find that 'ECDSA w/ SHA-256' has a COSE identifier of -7.
+
+Outputs:
+
+The output will be in the form of a `RegistrationResult` model object with the following fields:
+
+| variable       | type   | encoding                | description                                                                                             |
+|----------------|--------|-------------------------|---------------------------------------------------------------------------------------------------------|
+| keyHandle      | String | Base64URL               | A string identifier for the credential generated.                                                       |
+| clientData     | String | Base64URL               | [WebAuthn spec](https://www.w3.org/TR/webauthn/#dom-authenticatorresponse-clientdatajson)               |
+| attestationObj | String | CBOR and then Base64URL | [WebAuthn spec](https://www.w3.org/TR/webauthn/#dom-authenticatorattestationresponse-attestationobject) |
+
+This corresponds to the `AuthenticatorAttestationResponse` in the WebAuthn spec.
+
+### `initiateSigning`
+
+Inputs:
+
+| variable  | type   | description                                                                                                                                   |
+|-----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| keyHandle | String | The string identifier for the credential you are authenticating.  This should be the same as the output of the initial `initiateRegistration` |
+| challenge | String | The challenge string from the server to be signed by the FIDO client.                                                                         |
+| rpDomain  | String | The domain of the Relying Party. Same as the variable in `initiateRegistration`                                                               |
+
+Outputs:
+
+The output will be in the form of a `SigningResult` model object with the following fields:
+
+| variable   | type   | encoding  | description                                                                                                                                                                                            |
+|------------|--------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| keyHandle  | String | Base64URL | The string identifier for the credential                                                                                                                                                               |
+| clientData | String | Base64URL | [WebAuthn spec](https://www.w3.org/TR/webauthn/#dom-authenticatorresponse-clientdatajson)                                                                                                              |
+| authData   | String | Base64URL | [WebAuthn spec](https://www.w3.org/TR/webauthn/#authenticator-data)                                                                                                                                    |
+| signature  | String | Base64URL | The signature is to be sent to the server for verification of identity. <br/> It provides proof that the authenticator possesses the private key associated with the public key previously registered. |
+| userHandle | String | Base64URL | An opaque identifier for the user being authenticated.                                                                                                                                                 |
+
+This corresponds to the `AuthenticatorAssertionResponse` in the WebAuthn spec.
+
+### Hosting assetlinks.json file
+
 
 ## Example code from my repo
+
+## External resources for FIDO
+
+[W3 WebAuthn Spec](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
+[Mozilla Web Authentication Docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)
+[Fido2ApiClient API Reference](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/Fido2ApiClient)
+[Introduction to WebAuthn API](https://medium.com/@herrjemand/introduction-to-webauthn-api-5fd1fb46c285)
