@@ -44,7 +44,9 @@ There are 2 functions that are exposed to the user, each corresponding to a phas
 
 (2) `initiateSigning`
 
-It is fairly straightforward to understand the purpose of these functions. However, the inputs and outputs of these functions may be confusing. 
+It is fairly straightforward to understand the purpose of these functions. Calling these functions brings up a flow that guides the user through the processes of FIDO credential registration and signing respectively and the functions return futures of generated authenticator results which can be sent to the server for registration and authentication purposes.
+
+However, the inputs and outputs of these functions may be confusing. 
 
 Here is an explanation of the inputs and outputs of the above functions:
 
@@ -138,13 +140,30 @@ This step is very important! Without this, the plugin will not work. By hosting 
 
 3. Host the JSON file at https://example.com/.well-known/assetlinks.json, replacing example with your domain.
 
+### Getting everything to work
+
+1. While the user is logged in via traditional login processes, when the user needs to register a FIDO credential, request registration options from the server - these will be provided as inputs to `initiateRegistration`.
+2. Prompt the user to begin the registration phase by calling `initiateRegistration` with the registration options retrieved in the previous step.
+3. Format the `RegistrationResult` into something that your web server understands and send the results - the server will save the keyHandle(credential identifier) and public key and associate it to the user.
+4. The next time the user needs to verify their identity (e.g. for login), request signing options from the server - these will be provided as inputs to `initiateSigning`.
+5. Prompt the user to authenticate themselves by calling `initiateSigning` with the signing options retrieved in the previous step.
+5. Once again, format the `SigningResult` into something that your web server understands and send the results for verification. If the server deems that this is indeed a valid signature produced using the private key of the key pair previously registered, then the user has been authenticated.
+
 ## Example code from my repo
 
+If you wish to see a working example, you can take a look at this [repo](https://github.com/kkzeng/fido2-client-example-flutter);
+
 ## Common Issues
+
+Q: I am getting a white screen when I call `initiateRegistration` or `initiateSigning`. How do I fix this?
+A: Please check that you have hosted the assetlinks file correctly. Make sure you follow the steps for that correctly.
 
 ## External resources for FIDO
 
 [W3 WebAuthn Spec](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
+
 [Mozilla Web Authentication Docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)
+
 [Fido2ApiClient API Reference](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/Fido2ApiClient)
+
 [Introduction to WebAuthn API](https://medium.com/@herrjemand/introduction-to-webauthn-api-5fd1fb46c285)
