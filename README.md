@@ -1,8 +1,8 @@
-# Fido2 client
+# Fido2Client Plugin for Flutter
 
 ## Introduction
 
-Fido2Client is a Flutter plugin that allows you to use your Flutter app as an authenticator in the Fido2 process. with this plugin, your Flutter app can create and use public key based credentials to authenticate users.
+Fido2Client is a Flutter plugin that allows you to use your Flutter app as an authenticator in the Fido2 process. With this plugin, your Flutter app can create and use public key based credentials to authenticate users.
 
 The Fido2Client supports 2 main operations:
 
