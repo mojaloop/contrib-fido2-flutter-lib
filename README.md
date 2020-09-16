@@ -14,7 +14,7 @@ Registration is done once per authenticator per account. It is performed when li
 
 Signing is performed to verify a user's identity.
 
-For more information, refer to section: [insert link to section]()
+For more information, refer to this [section](#how-does-fido2-verify-a-users-identity-brief-overview)
 
 ## Warning
 
@@ -34,7 +34,7 @@ The whole FIDO2 process of authenticating a user is based on public key cryptogr
 
 The next time that the server wants to authenticate a user, they send a challenge - usually a randomly generated string with a fixed, predetermined length. The FIDO2 client uses the private key it previously stored to sign this string. From this process, a signature is produced. Using the previously registered public key, the server can check whether or not the signature produced was a result of using the associated private key to sign the particular challenge. The identity of the user is assumed from their ownership of the private key.
 
-For more information: [insert link to external resource]()
+For more information, refer to these [external resources](#external-resources-for-fido)
 
 ## How to use
 
@@ -149,7 +149,10 @@ This step is very important! Without this, the plugin will not work. By hosting 
 5. Prompt the user to authenticate themselves by calling `initiateSigning` with the signing options retrieved in the previous step.
 5. Once again, format the `SigningResult` into something that your web server understands and send the results for verification. If the server deems that this is indeed a valid signature produced using the private key of the key pair previously registered, then the user has been authenticated.
 
-## Example code from my repo
+If you want to see a working example, feel free to reference the [example fido flow](#example-fido-flow).
+If there are any issues, you may refer to the section on [common issues](#common-issues).
+
+## Example FIDO Flow
 
 If you wish to see a working example, you can take a look at this [repo](https://github.com/kkzeng/fido2-client-example-flutter)
 
