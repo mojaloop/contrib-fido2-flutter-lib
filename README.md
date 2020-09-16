@@ -6,11 +6,11 @@ Fido2Client is a Flutter plugin that allows you to use your Flutter app as an au
 
 The Fido2Client supports 2 main operations:
 
-(1) Registration
+(1) **Registration**
 
 Registration is done once per authenticator per account. It is performed when linking a credential to a user.
 
-(2) Signing
+(2) **Signing**
 
 Signing is performed to verify a user's identity.
 
@@ -151,12 +151,13 @@ This step is very important! Without this, the plugin will not work. By hosting 
 
 ## Example code from my repo
 
-If you wish to see a working example, you can take a look at this [repo](https://github.com/kkzeng/fido2-client-example-flutter);
+If you wish to see a working example, you can take a look at this [repo](https://github.com/kkzeng/fido2-client-example-flutter)
 
 ## Common Issues
 
-Q: I am getting a white screen when I call `initiateRegistration` or `initiateSigning`. How do I fix this?
-A: Please check that you have hosted the assetlinks file correctly. Make sure you follow the steps for that correctly.
+Issue: I am getting a white screen when I call `initiateRegistration` or `initiateSigning`. How do I fix this?
+
+Solution: Please check that you have hosted the assetlinks file correctly. Make sure you follow the steps for that correctly.
 
 ## External resources for FIDO
 
