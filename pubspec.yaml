@@ -21,9 +21,9 @@ dev_dependencies:
 flutter:
   plugin:
     platforms:
-      android:
-        package: mojaloop.fido2.fido2_client
-        pluginClass: Fido2ClientPlugin
+      # android:
+      #   package: mojaloop.fido2.fido2_client
+      #   pluginClass: Fido2ClientPlugin
       web:
-        pluginClass: Fido2ClientPlugin
-        filename: Fido2ClientPlugin_web.dart
+        pluginClass: Fido2ClientWeb
+        fileName: fido2_client_web.dart

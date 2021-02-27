@@ -130,4 +130,10 @@ class Fido2Client {
     _channel.invokeMethod('initiateSigning', args);
     return _signCompleter.future;
   }
+
+  void _consoleLog(String message) {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('message', () => message);
+    _channel.invokeMethod('consoleLog', args);
+  }
 }

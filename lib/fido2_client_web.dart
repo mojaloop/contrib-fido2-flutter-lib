@@ -10,26 +10,30 @@ import 'package:fido2_client/signing_result.dart';
 import 'authenticator_error.dart';
 
 /// A web implementation of the Fido2Client plugin.
-class Fido2Client {
+class Fido2ClientWeb {
   // Used to produce and complete Futures for each process
   Completer<RegistrationResult> _regCompleter = Completer();
   Completer<SigningResult> _signCompleter = Completer();
 
   static void registerWith(Registrar registrar) {
-    final MethodChannel channel = const MethodChannel('fido2_client');
+    // final MethodChannel channel = const MethodChannel('fido2_client');
 
-    // final MethodChannel channel = MethodChannel(
-    //   'hello',
-    //   const StandardMethodCodec(),
-    //   registrar,
-    // );
+    final MethodChannel channel = MethodChannel(
+      'fido2_client',
+      const StandardMethodCodec(),
+      registrar,
+    );
 
-    final pluginInstance = Fido2Client();
+    final pluginInstance = Fido2ClientWeb();
     channel.setMethodCallHandler(pluginInstance.handleMethodCall);
   }
 
   Future<dynamic> handleMethodCall(MethodCall call) async {
     switch (call.method) {
+      case 'consoleLog':
+        final String message = call.arguments['message'];
+        _initiateRegistration(message);
+        break;
       case 'initiateRegistration':
         final String message = call.arguments['message'];
         _initiateRegistration(message);
@@ -89,6 +93,10 @@ class Fido2Client {
   Future<String> getPlatformVersion() {
     final version = html.window.navigator.userAgent;
     return Future.value(version);
+  }
+
+  void consoleLog(String message) {
+    html.window.console.log('[TEST] _consoleLog' + message);
   }
 
   void _initiateRegistration(String message) {
