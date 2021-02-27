@@ -99,11 +99,11 @@ class Fido2ClientWeb {
     html.window.console.log('[TEST] _consoleLog' + message);
   }
 
-  void _initiateRegistration(String message) {
+  void initiateRegistration(String message) {
     html.window.console.log('[TEST] _initiateRegistration' + message);
   }
 
-  void _initiateSigning(String message) {
+  void initiateSigning(String message) {
     html.window.console.log('[TEST] _initiateSigning' + message);
   }
 }
