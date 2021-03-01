@@ -10,33 +10,32 @@ import 'package:fido2_client/signing_result.dart';
 import 'authenticator_error.dart';
 
 /// A web implementation of the Fido2Client plugin.
-class Fido2Client {
+class Fido2ClientWeb {
   // Used to produce and complete Futures for each process
   Completer<RegistrationResult> _regCompleter = Completer();
   Completer<SigningResult> _signCompleter = Completer();
 
   static void registerWith(Registrar registrar) {
-    final MethodChannel channel = const MethodChannel('fido2_client');
+    final MethodChannel channel = MethodChannel(
+      'Fido2ClientWeb',
+      const StandardMethodCodec(),
+      registrar,
+    );
 
-    // final MethodChannel channel = MethodChannel(
-    //   'hello',
-    //   const StandardMethodCodec(),
-    //   registrar,
-    // );
-
-    final pluginInstance = Fido2Client();
+    final pluginInstance = Fido2ClientWeb();
     channel.setMethodCallHandler(pluginInstance.handleMethodCall);
   }
 
+  // Hmm I don't think we need these now
   Future<dynamic> handleMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'initiateRegistration':
         final String message = call.arguments['message'];
-        _initiateRegistration(message);
+        initiateRegistration(message);
         break;
       case 'initiateSigning':
         final String message = call.arguments['message'];
-        _initiateSigning(message);
+        initiateSigning(message);
         break;
       case 'onRegistrationComplete':
         // WARNING: Do not add generics like Map<String, dynamic> - this causes breaking changes
@@ -91,11 +90,15 @@ class Fido2Client {
     return Future.value(version);
   }
 
-  void _initiateRegistration(String message) {
-    html.window.console.log('[TEST] _initiateRegistration' + message);
+  void consoleLog(String message) {
+    html.window.console.log('[TEST] Fido2ClientWeb ' + message);
   }
 
-  void _initiateSigning(String message) {
-    html.window.console.log('[TEST] _initiateSigning' + message);
+  void initiateRegistration(String message) {
+    html.window.console.log('[TEST] _initiateRegistration ' + message);
+  }
+
+  void initiateSigning(String message) {
+    html.window.console.log('[TEST] _initiateSigning ' + message);
   }
 }

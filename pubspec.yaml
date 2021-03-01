@@ -25,5 +25,5 @@ flutter:
         package: mojaloop.fido2.fido2_client
         pluginClass: Fido2ClientPlugin
       web:
-        pluginClass: Fido2ClientPlugin
-        filename: Fido2ClientPlugin_web.dart
+        pluginClass: Fido2ClientWeb
+        fileName: Fido2ClientPlugin_web.dart
