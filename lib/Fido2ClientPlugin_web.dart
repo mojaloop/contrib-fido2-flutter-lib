@@ -1,6 +1,7 @@
 import 'dart:async';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html show window;
+import 'dart:js' as js;
 
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -29,14 +30,6 @@ class Fido2ClientWeb {
   // Hmm I don't think we need these now
   Future<dynamic> handleMethodCall(MethodCall call) async {
     switch (call.method) {
-      case 'initiateRegistration':
-        final String message = call.arguments['message'];
-        initiateRegistration(message);
-        break;
-      case 'initiateSigning':
-        final String message = call.arguments['message'];
-        initiateSigning(message);
-        break;
       case 'onRegistrationComplete':
         // WARNING: Do not add generics like Map<String, dynamic> - this causes breaking changes
         Map args = call.arguments;
@@ -90,12 +83,43 @@ class Fido2ClientWeb {
     return Future.value(version);
   }
 
-  void consoleLog(String message) {
-    html.window.console.log('[TEST] Fido2ClientWeb ' + message);
-  }
+  Future<dynamic> initiateRegistration({String challenge, String userId}) {
+    final credentialCreationOptions = {
+      'publicKey': {
+        // TODO - make an array buffer!
+        'challenge': challenge,
+        "rp": {
+          "name": "Test Mojapay",
+          // "id": "pineapplepay.moja-lab.live",
+        },
+        'user': {
+          'id': userId,
+          'name': 'test@example.com',
+          'displayName': 'PineapplePay user'
+        },
+        'pubKeyCredParams': [
+          // {'alg': -7, 'type': 'public-key'}
+          {'alg': -7, 'type': 'public-key'}
+        ],
+        'authenticatorSelection': {'authenticatorAttachment': 'cross-platform'},
+        'timeout': 60000,
+        'attestation': 'direct'
+      }
+    };
+    print(credentialCreationOptions);
+    html.window.console.log(
+        'Fido2ClientWeb initiateRegistration with ' + challenge + ' ' + userId);
+    // html.window.console.log(credentialCreationOptions);
+    final jsCredentialCreationOptions =
+        new js.JsObject.jsify(credentialCreationOptions);
+    // final credential = js.context['navigator.credentials']
+    //     .callMethod('create', [jsCredentialCreationOptions]);
+    // html.window.console.log(jsCredentialCreationOptions);
+    js.context['console'].callMethod('log', [jsCredentialCreationOptions]);
 
-  void initiateRegistration(String message) {
-    html.window.console.log('[TEST] _initiateRegistration ' + message);
+    final credential =
+        html.window.navigator.credentials.create(credentialCreationOptions);
+    return Future.value(credential);
   }
 
   void initiateSigning(String message) {
