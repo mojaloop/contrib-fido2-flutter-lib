@@ -56,11 +56,12 @@ function initiateRegistration(challenge, userId, options) {
   if (!options) {
     options = {}
   }
-  
+
   const credentialCreationOptions = {
     challenge: str2ab(challenge),
     rp: options.rp || {
-      name: 'Example Corp'
+      id: 'pineapplepay.moja-lab.live',
+      name: 'Pineapple Pay'
     },
     user: {
       id: str2ab(userId),
@@ -70,9 +71,10 @@ function initiateRegistration(challenge, userId, options) {
     pubKeyCredParams: options.pubKeyCredParams || [
       { alg: -7, type: 'public-key' }
     ],
-    authenticatorSelection: options.authenticatorSelection || {
-      authenticatorAttachment: 'cross-platform'
-    },
+    // authenticatorSelection: options.authenticatorSelection || {
+    //   authenticatorAttachment: 'cross-platform',
+    //   // userVerification: 'discouraged'
+    // },
     timeout: options.timeout || 60000,
     attestation: options.attestation || 'direct'
   }

@@ -99,15 +99,8 @@ class Fido2ClientWeb {
     html.window.console.log(
         'Fido2ClientWeb initiateRegistration with ' + challenge + ' ' + userId);
     // TODO be able to pass in other params
-    // final Future<dynamic> credentialFuture = promiseToFuture(
-    //     js.context.callMethod('initiateRegistration', [challenge, userId]));
-    // final credential = await credentialFuture;
-
     final credential =
         await promiseToFuture(web_initiateRegistration(challenge, userId));
-
-    // final credential =
-    //     html.window.navigator.credentials.create(credentialCreationOptions);
     return credential;
   }
 
