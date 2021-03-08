@@ -1,7 +1,14 @@
+@JS()
+library fido2_client_plugin_web;
+
+// import 'dart:js' as js;
+import 'package:js/js.dart';
+import 'package:js/js_util.dart';
+// import 'dart:js_util';
+
 import 'dart:async';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html show window;
-import 'dart:js' as js;
 
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -9,6 +16,10 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:fido2_client/registration_result.dart';
 import 'package:fido2_client/signing_result.dart';
 import 'authenticator_error.dart';
+
+@JS('initiateRegistration')
+// ignore: non_constant_identifier_names
+external web_initiateRegistration(String challenge, String userId);
 
 /// A web implementation of the Fido2Client plugin.
 class Fido2ClientWeb {
@@ -83,24 +94,21 @@ class Fido2ClientWeb {
     return Future.value(version);
   }
 
-  Future<dynamic> initiateRegistration({String challenge, String userId}) {
+  Future<dynamic> initiateRegistration(
+      {String challenge, String userId}) async {
     html.window.console.log(
         'Fido2ClientWeb initiateRegistration with ' + challenge + ' ' + userId);
-    // html.window.console.log(credentialCreationOptions);
-    // final jsCredentialCreationOptions =
-    //     new js.JsObject.jsify(credentialCreationOptions);
-    // final credential = js.context['navigator.credentials']
-    //     .callMethod('create', [jsCredentialCreationOptions]);
-    // html.window.console.log(jsCredentialCreationOptions);
-    // js.context['console'].callMethod('log', [jsCredentialCreationOptions]);
-
     // TODO be able to pass in other params
+    // final Future<dynamic> credentialFuture = promiseToFuture(
+    //     js.context.callMethod('initiateRegistration', [challenge, userId]));
+    // final credential = await credentialFuture;
+
     final credential =
-        js.context.callMethod('initiateRegistration', [challenge, userId]);
+        await promiseToFuture(web_initiateRegistration(challenge, userId));
 
     // final credential =
     //     html.window.navigator.credentials.create(credentialCreationOptions);
-    return Future.value(credential);
+    return credential;
   }
 
   void initiateSigning(String message) {
