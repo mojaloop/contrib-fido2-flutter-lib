@@ -84,41 +84,22 @@ class Fido2ClientWeb {
   }
 
   Future<dynamic> initiateRegistration({String challenge, String userId}) {
-    final credentialCreationOptions = {
-      'publicKey': {
-        // TODO - make an array buffer!
-        'challenge': challenge,
-        "rp": {
-          "name": "Test Mojapay",
-          // "id": "pineapplepay.moja-lab.live",
-        },
-        'user': {
-          'id': userId,
-          'name': 'test@example.com',
-          'displayName': 'PineapplePay user'
-        },
-        'pubKeyCredParams': [
-          // {'alg': -7, 'type': 'public-key'}
-          {'alg': -7, 'type': 'public-key'}
-        ],
-        'authenticatorSelection': {'authenticatorAttachment': 'cross-platform'},
-        'timeout': 60000,
-        'attestation': 'direct'
-      }
-    };
-    print(credentialCreationOptions);
     html.window.console.log(
         'Fido2ClientWeb initiateRegistration with ' + challenge + ' ' + userId);
     // html.window.console.log(credentialCreationOptions);
-    final jsCredentialCreationOptions =
-        new js.JsObject.jsify(credentialCreationOptions);
+    // final jsCredentialCreationOptions =
+    //     new js.JsObject.jsify(credentialCreationOptions);
     // final credential = js.context['navigator.credentials']
     //     .callMethod('create', [jsCredentialCreationOptions]);
     // html.window.console.log(jsCredentialCreationOptions);
-    js.context['console'].callMethod('log', [jsCredentialCreationOptions]);
+    // js.context['console'].callMethod('log', [jsCredentialCreationOptions]);
 
+    // TODO be able to pass in other params
     final credential =
-        html.window.navigator.credentials.create(credentialCreationOptions);
+        js.context.callMethod('initiateRegistration', [challenge, userId]);
+
+    // final credential =
+    //     html.window.navigator.credentials.create(credentialCreationOptions);
     return Future.value(credential);
   }
 

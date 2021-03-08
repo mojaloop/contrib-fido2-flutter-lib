@@ -180,6 +180,7 @@ Solution: Please check that you have hosted the assetlinks file correctly. Make 
 function ab2str(buf) {
   return String.fromCharCode.apply(null, new Uint16Array(buf));
 }
+
 function str2ab(str) {
   var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
   var bufView = new Uint16Array(buf);
@@ -227,8 +228,7 @@ function initiateRegistration(challenge, userId, options) {
     user: {
       id: str2ab(userId),
       name: options.user && options.user.name || 'test@example.com'
-      displayName: options.user && options.user.displayName || 'test@example.com' 
-    },
+      displayName: options.user && optio 
     pubKeyCredParams: options.pubKeyCredParams || [
       {alg: -7, type: 'public-key'}
     ],

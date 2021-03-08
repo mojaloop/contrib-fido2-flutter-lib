@@ -27,3 +27,6 @@ flutter:
       web:
         pluginClass: Fido2ClientWeb
         fileName: Fido2ClientPlugin_web.dart
+
+  assets:
+    - assets/js/fido2_client.js
