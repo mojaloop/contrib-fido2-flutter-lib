@@ -26,25 +26,24 @@ function str2ab(str) {
  * @param challenge - the challenge string
  * @param userId - the userId string
  * @param options - optional parameters, for example:
-
-    {
-      rp: {
-        id: string,
-        name: string,
-      }
-      user: {
-        name: string
-        displayName: string
-      },
-      pubKeyCredParams: [
-        {alg: -7, type: 'public-key'}
-      ],
-      authenticatorSelection: {
-        authenticatorAttachment: 'cross-platform'
-      },
-      timeout: 60000,
-      attestation: 'direct'
-    }
+ *   {
+ *     rp: {
+ *       id: string,
+ *       name: string,
+ *     }
+ *     user: {
+ *       name: string
+ *       displayName: string
+ *     },
+ *     pubKeyCredParams: [
+ *       {alg: -7, type: 'public-key'}
+ *     ],
+ *     authenticatorSelection: {
+ *       authenticatorAttachment: 'cross-platform'
+ *     },
+ *     timeout: 60000,
+ *     attestation: 'direct'
+ *   }
  *
  * @returns {Promise<unknown>} - promise returned from navigator.crentials.create
  */
@@ -71,13 +70,48 @@ function initiateRegistration(challenge, userId, options) {
     pubKeyCredParams: options.pubKeyCredParams || [
       { alg: -7, type: 'public-key' }
     ],
-    // authenticatorSelection: options.authenticatorSelection || {
-    //   authenticatorAttachment: 'cross-platform',
-    //   // userVerification: 'discouraged'
-    // },
     timeout: options.timeout || 60000,
     attestation: options.attestation || 'direct'
   }
 
+  // add other values that default to empty:
+  if (options.authenticatorSelection) {
+    credentialCreationOptions.authenticatorSelection = options.authenticatorSelection
+  }
+
   return window.navigator.credentials.create({publicKey: credentialCreationOptions})
 }
+
+
+/**
+ * @function initiateSigning
+ * @param keyHandleId - the id of the key created in `window.navigator.credentials.create(...)`
+ * @param challenge - the challenge provided by the Relying Party
+ * @param rpId - _Optional_ the domain string of the Relying Party
+ * 
+ * @returns {Promise<unknown>} - promise returned from navigator.crentials.create
+ */
+function initiateSigning(keyHandleId, challenge, rpId) {
+  if (!keyHandleId || !challenge) {
+    throw new Error('keyHandle and challenge must be defined')
+  }
+
+  const publicKeyCredentialRequestOptions = {
+    challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
+    allowCredentials: [{
+      id: Uint8Array.from(keyHandleId, c => c.charCodeAt(0)),
+      type: 'public-key',
+      // TODO: expose this to the client library.
+      // transports: ['usb', 'ble', 'nfc'],
+    }],
+    timeout: 60000,
+  }
+
+  if (rpId) {
+    publicKeyCredentialRequestOptions.rpId = rpId
+  }
+
+  return await navigator.credentials.get({
+    publicKey: publicKeyCredentialRequestOptions
+  });
+ }

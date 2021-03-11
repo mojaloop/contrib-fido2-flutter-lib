@@ -19,7 +19,11 @@ import 'authenticator_error.dart';
 
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
-external web_initiateRegistration(String challenge, String userId);
+external web_initiateRegistration(
+    String challenge, String userId, Map<String, dynamic> options);
+@JS('initiateSigning')
+// ignore: non_constant_identifier_names
+external web_initiateSigning(String keyHandleId, String challenge, String rpId);
 
 /// A web implementation of the Fido2Client plugin.
 class Fido2ClientWeb {
@@ -95,16 +99,29 @@ class Fido2ClientWeb {
   }
 
   Future<dynamic> initiateRegistration(
-      {String challenge, String userId}) async {
-    html.window.console.log(
-        'Fido2ClientWeb initiateRegistration with ' + challenge + ' ' + userId);
-    // TODO be able to pass in other params
-    final credential =
-        await promiseToFuture(web_initiateRegistration(challenge, userId));
+      {String challenge, String userId, Map<String, dynamic> options}) async {
+    html.window.console.log('Fido2ClientWeb initiateRegistration with ' +
+        challenge +
+        ' ' +
+        userId +
+        ' and options: ' +
+        options.toString());
+    final credential = await promiseToFuture(
+        web_initiateRegistration(challenge, userId, options));
     return credential;
   }
 
-  void initiateSigning(String message) {
-    html.window.console.log('[TEST] _initiateSigning ' + message);
+  Future<dynamic> initiateSigning(
+      String keyHandleId, String challenge, String rpId) async {
+    html.window.console.log('Fido2ClientWeb initiateSigning with ' +
+        keyHandleId +
+        ' ' +
+        challenge +
+        ' and rpId: ' +
+        rpId);
+
+    final assertion = await promiseToFuture(
+        web_initiateSigning(keyHandleId, challenge, rpId));
+    return assertion;
   }
 }
