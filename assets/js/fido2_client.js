@@ -79,6 +79,8 @@ function initiateRegistration(challenge, userId, options) {
     credentialCreationOptions.authenticatorSelection = options.authenticatorSelection
   }
 
+  console.log(`calling window.navigator.credentials.create with options:\n ${JSON.stringify(credentialCreationOptions)}`)
+
   return window.navigator.credentials.create({publicKey: credentialCreationOptions})
 }
 
@@ -111,7 +113,9 @@ function initiateSigning(keyHandleId, challenge, rpId) {
     publicKeyCredentialRequestOptions.rpId = rpId
   }
 
-  return await navigator.credentials.get({
+  console.log('calling window.navigator.credentials.get with options: ', publicKeyCredentialRequestOptions)
+
+  return navigator.credentials.get({
     publicKey: publicKeyCredentialRequestOptions
   });
  }

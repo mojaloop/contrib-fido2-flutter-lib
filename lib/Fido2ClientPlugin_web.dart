@@ -1,10 +1,8 @@
 @JS()
 library fido2_client_plugin_web;
 
-// import 'dart:js' as js;
 import 'package:js/js.dart';
 import 'package:js/js_util.dart';
-// import 'dart:js_util';
 
 import 'dart:async';
 // ignore: avoid_web_libraries_in_flutter
@@ -17,10 +15,25 @@ import 'package:fido2_client/registration_result.dart';
 import 'package:fido2_client/signing_result.dart';
 import 'authenticator_error.dart';
 
+class AuthenticatorResponse {
+  List<ByteData> clientDataJSON;
+}
+
+@JS()
+@anonymous
+class PublicKeyCredential {
+  String id;
+  // todo: guessing how the types will be marshalled here...
+  List<ByteData> rawId;
+
+  // todo: guessing how the types will be marshalled here...
+  AuthenticatorResponse response;
+}
+
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
 external web_initiateRegistration(
-    String challenge, String userId, Map<String, dynamic> options);
+    String challenge, String userId, Object options);
 @JS('initiateSigning')
 // ignore: non_constant_identifier_names
 external web_initiateSigning(String keyHandleId, String challenge, String rpId);
@@ -106,9 +119,9 @@ class Fido2ClientWeb {
         userId +
         ' and options: ' +
         options.toString());
-    final credential = await promiseToFuture(
-        web_initiateRegistration(challenge, userId, options));
-    return credential;
+
+    return promiseToFuture(
+        web_initiateRegistration(challenge, userId, jsify(options)));
   }
 
   Future<dynamic> initiateSigning(
@@ -120,8 +133,6 @@ class Fido2ClientWeb {
         ' and rpId: ' +
         rpId);
 
-    final assertion = await promiseToFuture(
-        web_initiateSigning(keyHandleId, challenge, rpId));
-    return assertion;
+    return promiseToFuture(web_initiateSigning(keyHandleId, challenge, rpId));
   }
 }
