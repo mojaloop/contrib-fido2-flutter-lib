@@ -31,3 +31,7 @@ flutter:
 
   assets:
     - assets/js/fido2_client.js
+    # Copied from https://github.com/paroga/cbor-js
+    # ideally we would use this dependency properly
+    # or even just implement the cbor stuff in dart
+    - assets/js/cbor.js

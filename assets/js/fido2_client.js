@@ -47,7 +47,7 @@ function str2ab(str) {
  *
  * @returns {Promise<unknown>} - promise returned from navigator.crentials.create
  */
-function initiateRegistration(challenge, userId, options) {
+async function initiateRegistration(challenge, userId, options) {
   if (!challenge || !userId) {
     throw new Error('Challenge and userId must be defined')
   }
@@ -81,7 +81,17 @@ function initiateRegistration(challenge, userId, options) {
 
   console.log(`calling window.navigator.credentials.create with options:\n ${JSON.stringify(credentialCreationOptions)}`)
 
-  return window.navigator.credentials.create({publicKey: credentialCreationOptions})
+  const credential = await window.navigator.credentials.create(
+    {publicKey: credentialCreationOptions}
+  )
+  const utf8Decoder = new TextDecoder('utf-8');
+  const decodedClientData = utf8Decoder.decode(
+    credential.response.clientDataJSON)
+
+  // parse the string as an object
+  const clientDataObj = JSON.parse(decodedClientData);
+  console.log(clientDataObj)
+
 }
 
 
