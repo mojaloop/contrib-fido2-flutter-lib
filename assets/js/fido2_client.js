@@ -45,7 +45,7 @@ function str2ab(str) {
  *     attestation: 'direct'
  *   }
  *
- * @returns {Promise<unknown>} - promise returned from navigator.crentials.create
+ * @returns {Promise<Array<int>>} - the credentialId
  */
 async function initiateRegistration(challenge, userId, options) {
   if (!challenge || !userId) {

@@ -32,7 +32,7 @@ class PublicKeyCredential {
 
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
-external Future<List<dynamic>> web_initiateRegistration(
+external Future<List<int>> web_initiateRegistration(
     String challenge, String userId, Object options);
 @JS('initiateSigning')
 // ignore: non_constant_identifier_names
@@ -112,7 +112,7 @@ class Fido2ClientWeb {
     return Future.value(version);
   }
 
-  Future<List<dynamic>> initiateRegistration(
+  Future<List<int>> initiateRegistration(
       {String challenge, String userId, Map<String, dynamic> options}) async {
     html.window.console.log('Fido2ClientWeb initiateRegistration with ' +
         challenge +
