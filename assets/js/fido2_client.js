@@ -81,6 +81,14 @@ async function initiateRegistration(challenge, userId, options) {
 
   console.log(`calling window.navigator.credentials.create with options:\n ${JSON.stringify(credentialCreationOptions)}`)
 
+  // Note:
+  // The following would ideally be done inside of the Dart code
+  // but I'm not good enough at dart and navigating the Dart/JS
+  // interop tools to do this well. 
+  //
+  // For now, we'll just work on returning the credentialId and 
+  // attestation object so we can get the demos working.
+  // A more complete library would be much smarter about this
   const credential = await window.navigator.credentials.create(
     {publicKey: credentialCreationOptions}
   )
@@ -92,12 +100,33 @@ async function initiateRegistration(challenge, userId, options) {
   const clientDataObj = JSON.parse(decodedClientData);
   console.log(clientDataObj)
 
+  const decodedAttestationObj = CBOR.decode(
+    credential.response.attestationObject)
+
+  console.log('decoded Object: ' + decodedAttestationObj)
+
+  const { authData } = decodedAttestationObj
+  // get the length of the credential ID
+  const dataView = new DataView(
+    new ArrayBuffer(2));
+  const idLenBytes = authData.slice(53, 55);
+  idLenBytes.forEach(
+    (value, index) => dataView.setUint8(
+      index, value));
+  const credentialIdLength = dataView.getUint16();
+
+  // get the credential ID
+  const credentialId = authData.slice(
+    55, 55 + credentialIdLength);
+
+  // TODO: also return the attestation object
+  return credentialId;
 }
 
 
 /**
  * @function initiateSigning
- * @param keyHandleId - the id of the key created in `window.navigator.credentials.create(...)`
+ * @param {Int16Array} keyHandleId  - the id of the key created in `window.navigator.credentials.create(...)`
  * @param challenge - the challenge provided by the Relying Party
  * @param rpId - _Optional_ the domain string of the Relying Party
  * 
@@ -111,7 +140,8 @@ function initiateSigning(keyHandleId, challenge, rpId) {
   const publicKeyCredentialRequestOptions = {
     challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
     allowCredentials: [{
-      id: Uint8Array.from(keyHandleId, c => c.charCodeAt(0)),
+      id: Uint8Array.from(keyHandleId, c => c),
+      // id: keyHandleId,
       type: 'public-key',
       // TODO: expose this to the client library.
       // transports: ['usb', 'ble', 'nfc'],
@@ -123,7 +153,7 @@ function initiateSigning(keyHandleId, challenge, rpId) {
     publicKeyCredentialRequestOptions.rpId = rpId
   }
 
-  console.log('calling window.navigator.credentials.get with options: ', publicKeyCredentialRequestOptions)
+  console.log(`calling window.navigator.credentials.get with options:\n ${JSON.stringify(publicKeyCredentialRequestOptions)}`)
 
   return navigator.credentials.get({
     publicKey: publicKeyCredentialRequestOptions
