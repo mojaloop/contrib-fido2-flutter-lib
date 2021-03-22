@@ -32,11 +32,12 @@ class PublicKeyCredential {
 
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
-external web_initiateRegistration(
+external Future<List<int>> web_initiateRegistration(
     String challenge, String userId, Object options);
 @JS('initiateSigning')
 // ignore: non_constant_identifier_names
-external web_initiateSigning(String keyHandleId, String challenge, String rpId);
+external web_initiateSigning(
+    List<dynamic> keyHandleId, String challenge, String rpId);
 
 /// A web implementation of the Fido2Client plugin.
 class Fido2ClientWeb {
@@ -111,7 +112,7 @@ class Fido2ClientWeb {
     return Future.value(version);
   }
 
-  Future<dynamic> initiateRegistration(
+  Future<List<int>> initiateRegistration(
       {String challenge, String userId, Map<String, dynamic> options}) async {
     html.window.console.log('Fido2ClientWeb initiateRegistration with ' +
         challenge +
@@ -125,14 +126,7 @@ class Fido2ClientWeb {
   }
 
   Future<dynamic> initiateSigning(
-      String keyHandleId, String challenge, String rpId) async {
-    html.window.console.log('Fido2ClientWeb initiateSigning with ' +
-        keyHandleId +
-        ' ' +
-        challenge +
-        ' and rpId: ' +
-        rpId);
-
+      {List<dynamic> keyHandleId, String challenge, String rpId}) async {
     return promiseToFuture(web_initiateSigning(keyHandleId, challenge, rpId));
   }
 }
