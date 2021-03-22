@@ -16,13 +16,22 @@ Signing is performed to verify a user's identity.
 
 For more information, refer to this [section](#how-does-fido2-verify-a-users-identity-brief-overview)
 
-## Warning
 
-Note: The Fido2 client only supports Android currently!
+## Flutter Support
 
-Since Apple has only joined the FIDO alliance in Feb 2020, it is not expected that an iOS Fido2 client will be ready like the ones available for Android.
+| Platform | Supported |
+| --- | --- |
+| Android | `YES` |
+| iOS     | `NO` - see #5 |
+| Web     | `IN PROGRESS` |
 
-However, we are open to contributors interested in working on the iOS side.
+> ⚠️ __Warning__
+>
+> _The Fido2 client only supports Android currently!_
+> 
+> Since Apple has only joined the FIDO alliance in Feb 2020, it is not expected that an iOS Fido2 client will be ready like the ones available for Android.
+> 
+> However, we are open to contributors interested in working on the iOS side.
 
 ## Dependencies
 
@@ -36,7 +45,7 @@ The next time that the server wants to authenticate a user, they send a challeng
 
 For more information, refer to these [external resources](#external-resources-for-fido)
 
-## How to use
+## Using this Library (Android)
 
 There are 2 functions that are exposed to the user, each corresponding to a phase of the FIDO2 process:
 
@@ -155,6 +164,43 @@ If there are any issues, you may refer to the section on [common issues](#common
 ## Example FIDO Flow
 
 If you wish to see a working example, you can take a look at this [repo](https://github.com/kkzeng/fido2-client-example-flutter)
+
+
+## Using this Library (Web)
+
+Web support is currently a work in progress. Take a look at 
+`./lib/Fido2ClientPlugin_web.dart` and `./assets/js/fido2_client.js` for reference.
+
+In your `pubspec.yaml`, 
+
+```yaml
+...
+dependencies:
+  ...
+  fido2_client:
+    git:
+      url: git://github.com/mojaloop/fido2-client-plugin
+      ref: <some commit>
+```
+
+> Note:
+>
+> We aren't quite ready to make releases for this library yet, but it's on the radar.
+> For now you can pin to a git commit
+
+
+And in your `web/index.html`:
+
+```html
+...
+<body>
+  <!-- fido2_client -->
+  <script src="assets/packages/fido2_client/assets/js/fido2_client.js"></script>
+  <script src="assets/packages/fido2_client/assets/js/cbor.js"></script>
+  ...
+</body>
+
+```
 
 ## Common Issues
 
