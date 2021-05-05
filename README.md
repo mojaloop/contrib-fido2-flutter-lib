@@ -1,5 +1,28 @@
 # contrib-fido2-flutter-lib
-Fido2Client Plugin for Flutter
+A flutter plugin for using FIDO/WebAuthN APIs. Supports Android and Web.
+
+## Quick Start
+
+```bash
+pub get ...
+
+```
+
+## Supported Platforms
+
+| Platform | Supported     |
+| -------- | ------------- |
+| Android  | `YES`         |
+| iOS      | `NO` - see [#5](./issues/5) |
+| Web      | `IN PROGRESS` |
+
+> ⚠️ __Warning__
+>
+> _The Fido2 client only supports Android + Web currently!_
+> 
+> Since Apple has only joined the FIDO alliance in Feb 2020, it is not expected that an iOS Fido2 client will be ready like the ones available for Android.
+> 
+> However, we are open to contributors interested in working on the iOS side.
 
 ## Introduction
 
@@ -23,23 +46,7 @@ The whole FIDO2 process of authenticating a user is based on public key cryptogr
 
 The next time that the server wants to authenticate a user, they send a challenge - usually a randomly generated string with a fixed, predetermined length. The FIDO2 client uses the private key it previously stored to sign this string. From this process, a signature is produced. Using the previously registered public key, the server can check whether or not the signature produced was a result of using the associated private key to sign the particular challenge. The identity of the user is assumed from their ownership of the private key.
 
-For more information, refer to these [external resources](#external-resources-for-fido)
-
-## Flutter Support
-
-| Platform | Supported     |
-| -------- | ------------- |
-| Android  | `YES`         |
-| iOS      | `NO` - see [#5](./issues/5) |
-| Web      | `IN PROGRESS` |
-
-> ⚠️ __Warning__
->
-> _The Fido2 client only supports Android + Web currently!_
-> 
-> Since Apple has only joined the FIDO alliance in Feb 2020, it is not expected that an iOS Fido2 client will be ready like the ones available for Android.
-> 
-> However, we are open to contributors interested in working on the iOS side.
+For more information, refer to these [external resources](#see-also)
 
 
 ## API
@@ -105,7 +112,9 @@ The output will be in the form of a `SigningResult` model object with the follow
 This corresponds to the `AuthenticatorAssertionResponse` in the WebAuthn spec.
 
 
-## Using this Library (Android)
+## Usage
+
+### Android
 
 There are 2 functions that are exposed to the user, each corresponding to a phase of the FIDO2 process:
 
@@ -119,11 +128,13 @@ However, the inputs and outputs of these functions may be confusing.
 
 Here is an explanation of the inputs and outputs of the above functions:
 
-## Dependencies
+#### Dependencies
 
 The plugin uses the native Android library: Fido2ApiClient, specifically `com.google.android.gms:play-services-fido:18.1.0`.
 
-### Hosting assetlinks.json (VERY IMPORTANT!)
+TODO: example here
+
+#### Hosting assetlinks.json (VERY IMPORTANT!)
 
 This step is very important! Without this, the plugin will not work. By hosting the file that these instructions will teach you, your server is making a public statement about sharing credentials with your Flutter app.
 
@@ -152,7 +163,7 @@ This step is very important! Without this, the plugin will not work. By hosting 
 
 3. Host the JSON file at https://example.com/.well-known/assetlinks.json, replacing example with your domain.
 
-### Getting everything to work
+#### Getting everything to work
 
 1. While the user is logged in via traditional login processes, when the user needs to register a FIDO credential, request registration options from the server - these will be provided as inputs to `initiateRegistration`.
 2. Prompt the user to begin the registration phase by calling `initiateRegistration` with the registration options retrieved in the previous step.
@@ -164,12 +175,12 @@ This step is very important! Without this, the plugin will not work. By hosting 
 If you want to see a working example, feel free to reference the [example fido flow](#example-fido-flow).
 If there are any issues, you may refer to the section on [common issues](#common-issues).
 
-## Example FIDO Flow
+#### Example usage on Android
 
 If you wish to see a working example, you can take a look at this [repo](https://github.com/kkzeng/fido2-client-example-flutter)
 
 
-## Using this Library (Web)
+### Web
 
 Web support is currently a work in progress. Take a look at 
 `./lib/Fido2ClientPlugin_web.dart` and `./assets/js/fido2_client.js` for reference.
@@ -210,7 +221,7 @@ And in your `web/index.html`:
 1. __Q: I am getting a white screen when I call `initiateRegistration` or `initiateSigning`. How do I fix this?__
     Solution: Please check that you have hosted the assetlinks file correctly. Make sure you follow the steps for that correctly.
 
-## External resources for FIDO
+## See Also
 
 - [W3 WebAuthn Spec](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
 - [Mozilla Web Authentication Docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)
