@@ -30,15 +30,9 @@ Fido2Client is a Flutter plugin that allows you to use your Flutter app as an au
 
 The Fido2Client supports 2 main operations:
 
-1. **Registration**
+1. **Registration** - Registration is done once per authenticator per account. It is performed when linking a credential to a user.
 
-Registration is done once per authenticator per account. It is performed when linking a credential to a user.
-
-2. **Signing**
-
-Signing is performed to verify a user's identity.
-
-For more information, refer to this [section](#how-does-fido2-verify-a-users-identity-brief-overview)
+2. **Signing** - Signing is performed to verify a user's identity.
 
 ### How does FIDO2 verify a user's identity? (Brief overview)
 
@@ -54,38 +48,41 @@ the associated private key to sign the particular challenge. The identity of the
 
 Read more about FIDO [here]](#see-also)
 
-## API
+## API Calls
 ### `initiateRegistration`
+
+Initiates the registration process.
+
 
 #### Arguments:
 
-| variable        | type   | description                                                                  |
-|-----------------|--------|------------------------------------------------------------------------------|
-| challenge       | String | The string given by the server                                               |
-| userId          | String | The identifier of the user you are registering a credential for              |
-| username        | String | The name of the user you are registering a credential for                    |
-| rpDomain        | String | The domain of the Relying Party*                                             |
-| rpName          | String | The name of the Relying Party                                                |
-| coseAlgoValue** | int    | The unique COSE identifier for the algorithm to be used by the authenticator |
+| variable          | type     | description                                                                  |
+|-------------------|----------|------------------------------------------------------------------------------|
+| `challenge`       | `String` | The string given by the server                                               |
+| `userId`          | `String` | The identifier of the user you are registering a credential for              |
+| `username`        | `String` | The name of the user you are registering a credential for                    |
+| `rpDomain`        | `String` | The domain of the Relying Party*                                             |
+| `rpName`          | `String` | The name of the Relying Party                                                |
+| `coseAlgoValue**` | `int`    | The unique COSE identifier for the algorithm to be used by the authenticator |
 
 #### Example:
 
 ```dart
+import ...
+import ...
+
 //TODO!
 var result = initiateRegistration()
 ```
 
-\* A Relying Party refers to the party on whose behalf the authentication ceremony is being performed. 
-You can view the formal definition [here](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
-For example, if you were using this for a mobile app with a web server backend, then the web server would be the Relying Party.
+> \* A Relying Party refers to the party on whose behalf the authentication ceremony is being performed. 
+> You can view the formal definition [here](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
+> For example, if you were using this for a mobile app with a web server backend, then the web server would be the Relying Party.
 
-\*\* See the supported algorithms: [EC2 algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/EC2Algorithm) and [RSA algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/RSAAlgorithm)
-
-These 2 links will give you the supported descriptions of the supported algorithms e.g. 'ECDSA w/ SHA-256'.
-
-You can search for the algorithm identifier using the following links: [COSE registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms) and [WebAuthn registry](https://www.w3.org/TR/webauthn/#sctn-cose-alg-reg).
-
-You will find that 'ECDSA w/ SHA-256' has a COSE identifier of -7.
+> \*\* See the supported algorithms: [EC2 algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/EC2Algorithm) and [RSA algorithms](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/api/common/RSAAlgorithm)
+> These 2 links will give you the supported descriptions of the supported algorithms e.g. 'ECDSA w/ SHA-256'.
+> You can search for the algorithm identifier using the following links: [COSE registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms) and [WebAuthn registry](https://www.w3.org/TR/webauthn/#sctn-cose-alg-reg).
+> You will find that 'ECDSA w/ SHA-256' has a COSE identifier of -7.
 
 #### Return Values:
 
