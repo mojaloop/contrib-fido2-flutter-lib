@@ -1,4 +1,5 @@
-# Fido2Client Plugin for Flutter
+# contrib-fido2-flutter-lib
+Fido2Client Plugin for Flutter
 
 ## Introduction
 
@@ -6,38 +7,17 @@ Fido2Client is a Flutter plugin that allows you to use your Flutter app as an au
 
 The Fido2Client supports 2 main operations:
 
-(1) **Registration**
+1. **Registration**
 
 Registration is done once per authenticator per account. It is performed when linking a credential to a user.
 
-(2) **Signing**
+2. **Signing**
 
 Signing is performed to verify a user's identity.
 
 For more information, refer to this [section](#how-does-fido2-verify-a-users-identity-brief-overview)
 
-
-## Flutter Support
-
-| Platform | Supported |
-| --- | --- |
-| Android | `YES` |
-| iOS     | `NO` - see #5 |
-| Web     | `IN PROGRESS` |
-
-> ⚠️ __Warning__
->
-> _The Fido2 client only supports Android currently!_
-> 
-> Since Apple has only joined the FIDO alliance in Feb 2020, it is not expected that an iOS Fido2 client will be ready like the ones available for Android.
-> 
-> However, we are open to contributors interested in working on the iOS side.
-
-## Dependencies
-
-The plugin uses the native Android library: Fido2ApiClient, specifically `com.google.android.gms:play-services-fido:18.1.0`.
-
-## How does FIDO2 verify a user's identity? (Brief overview)
+### How does FIDO2 verify a user's identity? (Brief overview)
 
 The whole FIDO2 process of authenticating a user is based on public key cryptography. When the user is in the registration phase, the Fido2 client generates a key pair (1 public key and 1 private key) under the hood. The private key pair is stored somewhere secure on device while the public key pair is sent to the server and is associated to a particular user.
 
@@ -45,20 +25,24 @@ The next time that the server wants to authenticate a user, they send a challeng
 
 For more information, refer to these [external resources](#external-resources-for-fido)
 
-## Using this Library (Android)
+## Flutter Support
 
-There are 2 functions that are exposed to the user, each corresponding to a phase of the FIDO2 process:
+| Platform | Supported     |
+| -------- | ------------- |
+| Android  | `YES`         |
+| iOS      | `NO` - see [#5](./issues/5) |
+| Web      | `IN PROGRESS` |
 
-(1) `initiateRegistration`
+> ⚠️ __Warning__
+>
+> _The Fido2 client only supports Android + Web currently!_
+> 
+> Since Apple has only joined the FIDO alliance in Feb 2020, it is not expected that an iOS Fido2 client will be ready like the ones available for Android.
+> 
+> However, we are open to contributors interested in working on the iOS side.
 
-(2) `initiateSigning`
 
-It is fairly straightforward to understand the purpose of these functions. Calling these functions brings up a flow that guides the user through the processes of FIDO credential registration and signing respectively and the functions return futures of generated authenticator results which can be sent to the server for registration and authentication purposes.
-
-However, the inputs and outputs of these functions may be confusing. 
-
-Here is an explanation of the inputs and outputs of the above functions:
-
+## API
 ### `initiateRegistration`
 
 Inputs:
@@ -119,6 +103,25 @@ The output will be in the form of a `SigningResult` model object with the follow
 | userHandle | String | Base64URL | An opaque identifier for the user being authenticated.                                                                                                                                                 |
 
 This corresponds to the `AuthenticatorAssertionResponse` in the WebAuthn spec.
+
+
+## Using this Library (Android)
+
+There are 2 functions that are exposed to the user, each corresponding to a phase of the FIDO2 process:
+
+(1) `initiateRegistration`
+
+(2) `initiateSigning`
+
+It is fairly straightforward to understand the purpose of these functions. Calling these functions brings up a flow that guides the user through the processes of FIDO credential registration and signing respectively and the functions return futures of generated authenticator results which can be sent to the server for registration and authentication purposes.
+
+However, the inputs and outputs of these functions may be confusing. 
+
+Here is an explanation of the inputs and outputs of the above functions:
+
+## Dependencies
+
+The plugin uses the native Android library: Fido2ApiClient, specifically `com.google.android.gms:play-services-fido:18.1.0`.
 
 ### Hosting assetlinks.json (VERY IMPORTANT!)
 
@@ -202,19 +205,21 @@ And in your `web/index.html`:
 
 ```
 
-## Common Issues
+## FAQ
 
-Issue: I am getting a white screen when I call `initiateRegistration` or `initiateSigning`. How do I fix this?
-
-Solution: Please check that you have hosted the assetlinks file correctly. Make sure you follow the steps for that correctly.
+1. __Q: I am getting a white screen when I call `initiateRegistration` or `initiateSigning`. How do I fix this?__
+    Solution: Please check that you have hosted the assetlinks file correctly. Make sure you follow the steps for that correctly.
 
 ## External resources for FIDO
 
-[W3 WebAuthn Spec](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
+- [W3 WebAuthn Spec](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
+- [Mozilla Web Authentication Docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)
+- [Fido2ApiClient API Reference](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/Fido2ApiClient)
+- [Introduction to WebAuthn API](https://medium.com/@herrjemand/introduction-to-webauthn-api-5fd1fb46c285)
 
-[Mozilla Web Authentication Docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)
 
-[Fido2ApiClient API Reference](https://developers.google.com/android/reference/com/google/android/gms/fido/fido2/Fido2ApiClient)
 
-[Introduction to WebAuthn API](https://medium.com/@herrjemand/introduction-to-webauthn-api-5fd1fb46c285)
+## TODO:
 
+- publish to pub.dev
+- make sure APIs line up for web and android implementations
