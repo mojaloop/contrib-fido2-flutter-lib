@@ -42,17 +42,22 @@ For more information, refer to this [section](#how-does-fido2-verify-a-users-ide
 
 ### How does FIDO2 verify a user's identity? (Brief overview)
 
-The whole FIDO2 process of authenticating a user is based on public key cryptography. When the user is in the registration phase, the Fido2 client generates a key pair (1 public key and 1 private key) under the hood. The private key pair is stored somewhere secure on device while the public key pair is sent to the server and is associated to a particular user.
+The FIDO2 Authentication process is based on public key cryptography. 
+When the user is in the registration phase, the client generates an asymmetric keypair (1 public key and 1 private key). 
+The private key pair is stored somewhere secure on device while the public key pair is sent to the server and is associated to a particular user.
 
-The next time that the server wants to authenticate a user, they send a challenge - usually a randomly generated string with a fixed, predetermined length. The FIDO2 client uses the private key it previously stored to sign this string. From this process, a signature is produced. Using the previously registered public key, the server can check whether or not the signature produced was a result of using the associated private key to sign the particular challenge. The identity of the user is assumed from their ownership of the private key.
+The next time that the server wants to authenticate a user, they send a challenge - usually a randomly 
+generated string with a fixed, predetermined length. 
+The FIDO2 client uses the private key it previously stored to sign this string, producing a signature. 
+Using the previously registered public key, the server can check whether or not the signature produced was a result of using 
+the associated private key to sign the particular challenge. The identity of the user is assumed from their ownership of the private key.
 
-For more information, refer to these [external resources](#see-also)
-
+Read more about FIDO [here]](#see-also)
 
 ## API
 ### `initiateRegistration`
 
-Inputs:
+#### Arguments:
 
 | variable        | type   | description                                                                  |
 |-----------------|--------|------------------------------------------------------------------------------|
@@ -62,6 +67,13 @@ Inputs:
 | rpDomain        | String | The domain of the Relying Party*                                             |
 | rpName          | String | The name of the Relying Party                                                |
 | coseAlgoValue** | int    | The unique COSE identifier for the algorithm to be used by the authenticator |
+
+#### Example:
+
+```dart
+//TODO!
+var result = initiateRegistration()
+```
 
 \* A Relying Party refers to the party on whose behalf the authentication ceremony is being performed. 
 You can view the formal definition [here](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
@@ -75,7 +87,7 @@ You can search for the algorithm identifier using the following links: [COSE reg
 
 You will find that 'ECDSA w/ SHA-256' has a COSE identifier of -7.
 
-Outputs:
+#### Return Values:
 
 The output will be in the form of a `RegistrationResult` model object with the following fields:
 
