@@ -88,35 +88,36 @@ var result = initiateRegistration()
 
 The output will be in the form of a `RegistrationResult` model object with the following fields:
 
-| variable       | type   | encoding                | description                                                                                             |
-|----------------|--------|-------------------------|---------------------------------------------------------------------------------------------------------|
-| keyHandle      | String | Base64URL               | A string identifier for the credential generated.                                                       |
-| clientData     | String | Base64URL               | [WebAuthn spec](https://www.w3.org/TR/webauthn/#dom-authenticatorresponse-clientdatajson)               |
-| attestationObj | String | CBOR and then Base64URL | [WebAuthn spec](https://www.w3.org/TR/webauthn/#dom-authenticatorattestationresponse-attestationobject) |
+| variable         | type     | encoding                | description                                                                                             |
+|------------------|--------- |-------------------------|---------------------------------------------------------------------------------------------------------|
+| `keyHandle`      | `String` | Base64URL               | A string identifier for the credential generated.                                                       |
+| `clientData`     | `String` | Base64URL               | See [WebAuthn spec](https://www.w3.org/TR/webauthn/#dom-authenticatorresponse-clientdatajson)               |
+| `attestationObj` | `String` | CBOR and then Base64URL | See [WebAuthn spec](https://www.w3.org/TR/webauthn/#dom-authenticatorattestationresponse-attestationobject) |
 
 This corresponds to the `AuthenticatorAttestationResponse` in the WebAuthn spec.
 
 ### `initiateSigning`
 
-Inputs:
+Kicks off the signing process.
+#### Arguments:
 
-| variable  | type   | description                                                                                                                                   |
-|-----------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| keyHandle | String | The string identifier for the credential you are authenticating.  This should be the same as the output of the initial `initiateRegistration` |
-| challenge | String | The challenge string from the server to be signed by the FIDO client.                                                                         |
-| rpDomain  | String | The domain of the Relying Party. Same as the variable in `initiateRegistration`                                                               |
+| variable    | type     | description                                                                                                                                   |
+|-------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyHandle` | `String` | The string identifier for the credential you are authenticating.  This should be the same as the output of the initial `initiateRegistration` |
+| `challenge` | `String` | The challenge string from the server to be signed by the FIDO client.                                                                         |
+| `rpDomain`  | `String` | The domain of the Relying Party. Same as the variable in `initiateRegistration`                                                               |
 
-Outputs:
+#### Return Values:
 
 The output will be in the form of a `SigningResult` model object with the following fields:
 
-| variable   | type   | encoding  | description                                                                                                                                                                                            |
-|------------|--------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| keyHandle  | String | Base64URL | The string identifier for the credential                                                                                                                                                               |
-| clientData | String | Base64URL | [WebAuthn spec](https://www.w3.org/TR/webauthn/#dom-authenticatorresponse-clientdatajson)                                                                                                              |
-| authData   | String | Base64URL | [WebAuthn spec](https://www.w3.org/TR/webauthn/#authenticator-data)                                                                                                                                    |
-| signature  | String | Base64URL | The signature is to be sent to the server for verification of identity. <br/> It provides proof that the authenticator possesses the private key associated with the public key previously registered. |
-| userHandle | String | Base64URL | An opaque identifier for the user being authenticated.                                                                                                                                                 |
+| variable     | type     | encoding  | description                                                                                                                                                                                            |
+|--------------|----------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keyHandle`  | `String` | Base64URL | The string identifier for the credential                                                                                                                                                               |
+| `clientData` | `String` | Base64URL | [WebAuthn spec](https://www.w3.org/TR/webauthn/#dom-authenticatorresponse-clientdatajson)                                                                                                              |
+| `authData`   | `String` | Base64URL | [WebAuthn spec](https://www.w3.org/TR/webauthn/#authenticator-data)                                                                                                                                    |
+| `signature`  | `String` | Base64URL | The signature is to be sent to the server for verification of identity. <br/> It provides proof that the authenticator possesses the private key associated with the public key previously registered. |
+| `userHandle` | `String` | Base64URL | An opaque identifier for the user being authenticated.                                                                                                                                                 |
 
 This corresponds to the `AuthenticatorAssertionResponse` in the WebAuthn spec.
 
@@ -124,19 +125,6 @@ This corresponds to the `AuthenticatorAssertionResponse` in the WebAuthn spec.
 ## Usage
 
 ### Android
-
-There are 2 functions that are exposed to the user, each corresponding to a phase of the FIDO2 process:
-
-(1) `initiateRegistration`
-
-(2) `initiateSigning`
-
-It is fairly straightforward to understand the purpose of these functions. Calling these functions brings up a flow that guides the user through the processes of FIDO credential registration and signing respectively and the functions return futures of generated authenticator results which can be sent to the server for registration and authentication purposes.
-
-However, the inputs and outputs of these functions may be confusing. 
-
-Here is an explanation of the inputs and outputs of the above functions:
-
 #### Dependencies
 
 The plugin uses the native Android library: Fido2ApiClient, specifically `com.google.android.gms:play-services-fido:18.1.0`.
@@ -148,9 +136,9 @@ TODO: example here
 This step is very important! Without this, the plugin will not work. By hosting the file that these instructions will teach you, your server is making a public statement about sharing credentials with your Flutter app.
 
 1. Generate your app's SHA256 fingerprint by following the steps [here](https://developers.google.com/android/guides/client-auth)
-2. In the JSON file below, replace "app sha256 fingerprint" with your app's SHA256 fingerprint.
+2. In the JSON file below, replace `"app sha256 fingerprint"` with your app's SHA256 fingerprint.
 
-`assetlinks.json`
+**`assetlinks.json`**
 
 ```
 [
@@ -170,9 +158,9 @@ This step is very important! Without this, the plugin will not work. By hosting 
 ]
 ```
 
-3. Host the JSON file at https://example.com/.well-known/assetlinks.json, replacing example with your domain.
+3. Host the JSON file at https://your-domain.com/.well-known/assetlinks.json.
 
-#### Getting everything to work
+#### Tying it all together
 
 1. While the user is logged in via traditional login processes, when the user needs to register a FIDO credential, request registration options from the server - these will be provided as inputs to `initiateRegistration`.
 2. Prompt the user to begin the registration phase by calling `initiateRegistration` with the registration options retrieved in the previous step.
@@ -184,7 +172,7 @@ This step is very important! Without this, the plugin will not work. By hosting 
 If you want to see a working example, feel free to reference the [example fido flow](#example-fido-flow).
 If there are any issues, you may refer to the section on [common issues](#common-issues).
 
-#### Example usage on Android
+#### Full Android Example
 
 If you wish to see a working example, you can take a look at this [repo](https://github.com/kkzeng/fido2-client-example-flutter)
 
@@ -208,7 +196,7 @@ dependencies:
 
 > Note:
 >
-> We aren't quite ready to make releases for this library yet, but it's on the radar.
+> We aren't quite ready to make releases for this library yet, but it's on the radar. 
 > For now you can pin to a git commit
 
 
@@ -241,5 +229,7 @@ And in your `web/index.html`:
 
 ## TODO:
 
+- add flutter example
 - publish to pub.dev
 - make sure APIs line up for web and android implementations
+- change method names to something better
