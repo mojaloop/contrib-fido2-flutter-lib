@@ -46,7 +46,7 @@ The FIDO2 client uses the private key it previously stored to sign this string, 
 Using the previously registered public key, the server can check whether or not the signature produced was a result of using 
 the associated private key to sign the particular challenge. The identity of the user is assumed from their ownership of the private key.
 
-Read more about FIDO [here]](#see-also)
+Read more about FIDO [here](#see-also)
 
 ## API Calls
 ### `initiateRegistration`
@@ -229,6 +229,7 @@ And in your `web/index.html`:
 
 ## TODO:
 
+- TOC
 - add flutter example
 - publish to pub.dev
 - make sure APIs line up for web and android implementations
