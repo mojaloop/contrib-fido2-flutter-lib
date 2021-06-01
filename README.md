@@ -2,28 +2,14 @@
 A flutter plugin for using FIDO/WebAuthN APIs. Supports Android and Web.
 
 <!-- vscode-markdown-toc -->
-* 1. [Quick Start](#QuickStart)
-* 2. [Supported Platforms](#SupportedPlatforms)
-* 3. [Introduction](#Introduction)
-	* 3.1. [How does FIDO2 verify a user's identity? (Brief overview)](#HowdoesFIDO2verifyausersidentityBriefoverview)
-* 4. [API Calls](#APICalls)
-	* 4.1. [`initiateRegistration`](#initiateRegistration)
-		* 4.1.1. [Arguments:](#Arguments:)
-		* 4.1.2. [Example:](#Example:)
-		* 4.1.3. [Return Values:](#ReturnValues:)
-	* 4.2. [`initiateSigning`](#initiateSigning)
-		* 4.2.1. [Arguments:](#Arguments:-1)
-		* 4.2.2. [Return Values:](#ReturnValues:-1)
-* 5. [Usage](#Usage)
-	* 5.1. [Android](#Android)
-		* 5.1.1. [Dependencies](#Dependencies)
-		* 5.1.2. [Hosting assetlinks.json (VERY IMPORTANT!)](#Hostingassetlinks.jsonVERYIMPORTANT)
-		* 5.1.3. [Tying it all together](#Tyingitalltogether)
-		* 5.1.4. [Full Android Example](#FullAndroidExample)
-	* 5.2. [Web](#Web)
-* 6. [FAQ](#FAQ)
-* 7. [See Also](#SeeAlso)
-* 8. [TODO:](#TODO:)
+1. [Quick Start](#QuickStart)
+2. [Supported Platforms](#SupportedPlatforms)
+3. [Introduction](#Introduction)
+4. [API Calls](#APICalls)
+5. [Usage](#Usage)
+6. [FAQ](#FAQ)
+7. [See Also](#SeeAlso)
+8. [TODO:](#TODO)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -256,9 +242,8 @@ And in your `web/index.html`:
 
 
 
-##  8. <a name='TODO:'></a>TODO:
+##  8. <a name='TODO'></a>TODO
 
-- TOC
 - add flutter example
 - publish to pub.dev
 - make sure APIs line up for web and android implementations
