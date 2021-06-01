@@ -93,7 +93,7 @@ async function initiateRegistration(challenge, userId, options) {
     {publicKey: credentialCreationOptions}
   )
 
-  console.log(`credential is:\n ${JSON.stringify(credential)}`)
+  console.log(`credential is:`, credential)
 
   const utf8Decoder = new TextDecoder('utf-8');
   const decodedClientData = utf8Decoder.decode(
