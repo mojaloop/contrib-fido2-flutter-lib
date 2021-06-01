@@ -128,7 +128,7 @@ class Fido2ClientWeb {
   ///
   /// The method returns a [RegistrationResult] future that is completed after the
   /// user completes the authentication process.
-  Future<List<int>> initiateRegistration(
+  Future<PublicKeyCredential> initiateRegistration(
       String challenge, String userId, Map<String, dynamic> options) async {
     // TODO: remove
     // html.window.console.log('Fido2ClientWeb initiateRegistration with ' +
