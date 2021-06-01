@@ -72,14 +72,14 @@ Initiates the registration process.
 
 ####  4.1.1. <a name='Arguments:'></a>Arguments:
 
-| variable          | type     | description                                                                  |
-|-------------------|----------|------------------------------------------------------------------------------|
-| `challenge`       | `String` | The string given by the server                                               |
-| `userId`          | `String` | The identifier of the user you are registering a credential for              |
-| `username`        | `String` | The name of the user you are registering a credential for                    |
-| `rpDomain`        | `String` | The domain of the Relying Party*                                             |
-| `rpName`          | `String` | The name of the Relying Party                                                |
-| `coseAlgoValue**` | `int`    | The unique COSE identifier for the algorithm to be used by the authenticator |
+| variable                  | type     | description                                                                  |
+|---------------------------|----------|------------------------------------------------------------------------------|
+| `challenge`               | `String` | The string given by the server                                               |
+| `userId`                  | `String` | The identifier of the user you are registering a credential for              |
+| `options.username`        | `String` | The name of the user you are registering a credential for                    |
+| `options.rpDomain`        | `String` | The domain of the Relying Party*                                             |
+| `options.rpName`          | `String` | The name of the Relying Party                                                |
+| `options.coseAlgoValue**` | `int`    | The unique COSE identifier for the algorithm to be used by the authenticator |
 
 ####  4.1.2. <a name='Example:'></a>Example:
 
