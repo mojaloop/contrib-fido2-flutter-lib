@@ -33,7 +33,7 @@ class AuthenticatorResponse {
 
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
-external Future<PublicKeyCredential> webInitiateRegistration(
+external Future<PublicKeyCredential> web_initiateRegistration(
     String challenge, String userId, Object options);
 @JS('initiateSigning')
 // ignore: non_constant_identifier_names
@@ -138,8 +138,14 @@ class Fido2ClientWeb {
     //     ' and options: ' +
     //     options.toString());
 
-    return promiseToFuture(
-        webInitiateRegistration(challenge, userId, jsify(options)));
+    // TODO: how do we marshall from the JS object to our PublicKeyCredential?
+
+    var jsPromise = web_initiateRegistration(challenge, userId, jsify(options));
+    var jsObject = await promiseToFuture(jsPromise);
+
+    print('myobject is: ' + jsObject.toString());
+
+    return PublicKeyCredential.fromJSObject(jsObject);
   }
 
   /// Begins the FIDO signing process.

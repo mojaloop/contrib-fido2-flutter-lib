@@ -3,6 +3,11 @@ import 'package:fido2_client/authenticator_attestation_response.dart';
 class PublicKeyCredential {
   PublicKeyCredential({this.id, this.response});
 
+  static fromJSObject(dynamic jsObject) {
+    return new PublicKeyCredential(
+        id: jsObject['id'], response: jsObject['response']);
+  }
+
   // TODO: should this be an arraybuffer?
   String id;
   AuthenticatorAttestationResponse response;
