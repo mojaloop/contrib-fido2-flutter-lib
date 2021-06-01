@@ -119,7 +119,7 @@ async function initiateRegistration(challenge, userId, options) {
   const credentialId = authData.slice(
     55, 55 + credentialIdLength);
 
-  // TODO: also return the attestation object
+  // TODO: also return the attestation object 
   return credentialId;
 }
 
