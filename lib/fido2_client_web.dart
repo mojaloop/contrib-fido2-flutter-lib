@@ -33,7 +33,7 @@ class AuthenticatorResponse {
 
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
-external Future<PublicKeyCredential> web_initiateRegistration(
+external Future<PublicKeyCredential> initiateRegistration(
     String challenge, String userId, Object options);
 @JS('initiateSigning')
 // ignore: non_constant_identifier_names
@@ -139,7 +139,7 @@ class Fido2ClientWeb {
     //     options.toString());
 
     return promiseToFuture(
-        web_initiateRegistration(challenge, userId, jsify(options)));
+        initiateRegistration(challenge, userId, jsify(options)));
   }
 
   /// Begins the FIDO signing process.
