@@ -3,28 +3,21 @@ A flutter plugin for using FIDO/WebAuthN APIs. Supports Android and Web.
 
 ## Contents:
 <!-- vscode-markdown-toc -->
-1. [Quick Start](#QuickStart)
-2. [Supported Platforms](#SupportedPlatforms)
-3. [Introduction](#Introduction)
-4. [API Calls](#APICalls)
-5. [Usage](#Usage)
-6. [FAQ](#FAQ)
-7. [See Also](#SeeAlso)
-8. [TODO](#TODO)
+1. [Supported Platforms](#SupportedPlatforms)
+2. [Introduction](#Introduction)
+3. [API Calls](#APICalls)
+4. [Usage](#Usage)
+5. [FAQ](#FAQ)
+6. [See Also](#SeeAlso)
+7. [TODO](#TODO)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
 	autoSave=true
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
-##  1. <a name='QuickStart'></a>Quick Start
 
-```bash
-pub get ...
-
-```
-
-##  2. <a name='SupportedPlatforms'></a>Supported Platforms
+##  1. <a name='SupportedPlatforms'></a>Supported Platforms
 
 | Platform | Supported     |
 | -------- | ------------- |
@@ -40,7 +33,7 @@ pub get ...
 > 
 > However, we are open to contributors interested in working on the iOS side.
 
-##  3. <a name='Introduction'></a>Introduction
+##  2. <a name='Introduction'></a>Introduction
 
 Fido2Client is a Flutter plugin that allows you to use your Flutter app as an authenticator in the Fido2 process. With this plugin, your Flutter app can create and use public key based credentials to authenticate users.
 
@@ -50,7 +43,7 @@ The Fido2Client supports 2 main operations:
 
 2. **Signing** - Signing is performed to verify a user's identity.
 
-###  3.1. <a name='HowdoesFIDO2verifyausersidentityBriefoverview'></a>How does FIDO2 verify a user's identity? (Brief overview)
+###  2.1. <a name='HowdoesFIDO2verifyausersidentityBriefoverview'></a>How does FIDO2 verify a user's identity? (Brief overview)
 
 The FIDO2 Authentication process is based on public key cryptography. 
 When the user is in the registration phase, the client generates an asymmetric keypair (1 public key and 1 private key). 
@@ -64,13 +57,13 @@ the associated private key to sign the particular challenge. The identity of the
 
 Read more about FIDO [here](#see-also)
 
-##  4. <a name='APICalls'></a>API Calls
-###  4.1. <a name='initiateRegistration'></a>`initiateRegistration`
+##  3. <a name='APICalls'></a>API Calls
+###  3.1. <a name='initiateRegistration'></a>`initiateRegistration`
 
 Initiates the registration process.
 
 
-####  4.1.1. <a name='Arguments:'></a>Arguments:
+####  3.1.1. <a name='Arguments:'></a>Arguments:
 
 | variable                  | type     | description                                                                  |
 |---------------------------|----------|------------------------------------------------------------------------------|
@@ -81,7 +74,7 @@ Initiates the registration process.
 | `options.rpName`          | `String` | The name of the Relying Party                                                |
 | `options.coseAlgoValue**` | `int`    | The unique COSE identifier for the algorithm to be used by the authenticator |
 
-####  4.1.2. <a name='Example:'></a>Example:
+####  3.1.2. <a name='Example:'></a>Example:
 
 ```dart
 import ...
@@ -100,7 +93,7 @@ var result = initiateRegistration()
 > You can search for the algorithm identifier using the following links: [COSE registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms) and [WebAuthn registry](https://www.w3.org/TR/webauthn/#sctn-cose-alg-reg).
 > You will find that 'ECDSA w/ SHA-256' has a COSE identifier of -7.
 
-####  4.1.3. <a name='ReturnValues:'></a>Return Values:
+####  3.1.3. <a name='ReturnValues:'></a>Return Values:
 
 The output will be in the form of a `RegistrationResult` model object with the following fields:
 
@@ -112,10 +105,10 @@ The output will be in the form of a `RegistrationResult` model object with the f
 
 This corresponds to the `AuthenticatorAttestationResponse` in the WebAuthn spec.
 
-###  4.2. <a name='initiateSigning'></a>`initiateSigning`
+###  3.2. <a name='initiateSigning'></a>`initiateSigning`
 
 Kicks off the signing process.
-####  4.2.1. <a name='Arguments:-1'></a>Arguments:
+####  3.2.1. <a name='Arguments:-1'></a>Arguments:
 
 | variable    | type     | description                                                                                                                                   |
 |-------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------|
@@ -123,7 +116,7 @@ Kicks off the signing process.
 | `challenge` | `String` | The challenge string from the server to be signed by the FIDO client.                                                                         |
 | `rpDomain`  | `String` | The domain of the Relying Party. Same as the variable in `initiateRegistration`                                                               |
 
-####  4.2.2. <a name='ReturnValues:-1'></a>Return Values:
+####  3.2.2. <a name='ReturnValues:-1'></a>Return Values:
 
 The output will be in the form of a `SigningResult` model object with the following fields:
 
@@ -138,16 +131,16 @@ The output will be in the form of a `SigningResult` model object with the follow
 This corresponds to the `AuthenticatorAssertionResponse` in the WebAuthn spec.
 
 
-##  5. <a name='Usage'></a>Usage
+##  4. <a name='Usage'></a>Usage
 
-###  5.1. <a name='Android'></a>Android
-####  5.1.1. <a name='Dependencies'></a>Dependencies
+###  4.1. <a name='Android'></a>Android
+####  4.1.1. <a name='Dependencies'></a>Dependencies
 
 The plugin uses the native Android library: Fido2ApiClient, specifically `com.google.android.gms:play-services-fido:18.1.0`.
 
 TODO: example here
 
-####  5.1.2. <a name='Hostingassetlinks.jsonVERYIMPORTANT'></a>Hosting assetlinks.json (VERY IMPORTANT!)
+####  4.1.2. <a name='Hostingassetlinks.jsonVERYIMPORTANT'></a>Hosting assetlinks.json (VERY IMPORTANT!)
 
 This step is very important! Without this, the plugin will not work. By hosting the file that these instructions will teach you, your server is making a public statement about sharing credentials with your Flutter app.
 
@@ -176,7 +169,7 @@ This step is very important! Without this, the plugin will not work. By hosting 
 
 3. Host the JSON file at https://your-domain.com/.well-known/assetlinks.json.
 
-####  5.1.3. <a name='Tyingitalltogether'></a>Tying it all together
+####  4.1.3. <a name='Tyingitalltogether'></a>Tying it all together
 
 1. While the user is logged in via traditional login processes, when the user needs to register a FIDO credential, request registration options from the server - these will be provided as inputs to `initiateRegistration`.
 2. Prompt the user to begin the registration phase by calling `initiateRegistration` with the registration options retrieved in the previous step.
@@ -188,12 +181,12 @@ This step is very important! Without this, the plugin will not work. By hosting 
 If you want to see a working example, feel free to reference the [example fido flow](#example-fido-flow).
 If there are any issues, you may refer to the section on [common issues](#common-issues).
 
-####  5.1.4. <a name='FullAndroidExample'></a>Full Android Example
+####  4.1.4. <a name='FullAndroidExample'></a>Full Android Example
 
 If you wish to see a working example, you can take a look at this [repo](https://github.com/kkzeng/fido2-client-example-flutter)
 
 
-###  5.2. <a name='Web'></a>Web
+###  4.2. <a name='Web'></a>Web
 
 Web support is currently a work in progress. Take a look at 
 `./lib/Fido2ClientPlugin_web.dart` and `./assets/js/fido2_client.js` for reference.
@@ -229,12 +222,12 @@ And in your `web/index.html`:
 
 ```
 
-##  6. <a name='FAQ'></a>FAQ
+##  5. <a name='FAQ'></a>FAQ
 
 1. __Q: I am getting a white screen when I call `initiateRegistration` or `initiateSigning`. How do I fix this?__
     Solution: Please check that you have hosted the assetlinks file correctly. Make sure you follow the steps for that correctly.
 
-##  7. <a name='SeeAlso'></a>See Also
+##  6. <a name='SeeAlso'></a>See Also
 
 - [W3 WebAuthn Spec](https://www.w3.org/TR/webauthn/#webauthn-relying-party)
 - [Mozilla Web Authentication Docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)
@@ -243,8 +236,6 @@ And in your `web/index.html`:
 
 
 
-##  8. <a name='TODO'></a>TODO
+##  7. <a name='TODO'></a>TODO
 
-- update quick start
 - add flutter example
-- publish to pub.dev
