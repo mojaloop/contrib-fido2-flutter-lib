@@ -6,7 +6,7 @@ class PublicKeyCredential {
   // PublicKeyCredential({this.id, this.response});
   PublicKeyCredential({this.id});
 
-  static fromJSObject(JsObject jsObject) {
+  static fromJSObject(dynamic jsObject) {
     return new PublicKeyCredential(id: jsObject['id']);
   }
 
