@@ -1,6 +1,7 @@
 # contrib-fido2-flutter-lib
 A flutter plugin for using FIDO/WebAuthN APIs. Supports Android and Web.
 
+## Contents:
 <!-- vscode-markdown-toc -->
 1. [Quick Start](#QuickStart)
 2. [Supported Platforms](#SupportedPlatforms)
