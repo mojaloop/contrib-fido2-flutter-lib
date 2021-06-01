@@ -1,6 +1,8 @@
 @JS()
 library fido2_client_plugin_web;
 
+import 'dart:js';
+
 import 'package:fido2_client/public_key_credential.dart';
 import 'package:js/js.dart';
 import 'package:js/js_util.dart';
@@ -141,7 +143,7 @@ class Fido2ClientWeb {
     // TODO: how do we marshall from the JS object to our PublicKeyCredential?
 
     var jsPromise = web_initiateRegistration(challenge, userId, jsify(options));
-    var jsObject = await promiseToFuture(jsPromise);
+    var jsObject = await promiseToFuture<JsObject>(jsPromise);
 
     print('myobject is: ' + jsObject.toString());
 
