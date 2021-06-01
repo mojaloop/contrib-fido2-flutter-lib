@@ -20,8 +20,8 @@ class AuthenticatorResponse {
   List<ByteData> clientDataJSON;
 }
 
-@JS()
-@anonymous
+// @JS()
+// @anonymous
 // class PublicKeyCredential {
 //   String id;
 //   // todo: guessing how the types will be marshalled here...
