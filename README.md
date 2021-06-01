@@ -10,7 +10,7 @@ A flutter plugin for using FIDO/WebAuthN APIs. Supports Android and Web.
 5. [Usage](#Usage)
 6. [FAQ](#FAQ)
 7. [See Also](#SeeAlso)
-8. [TODO:](#TODO)
+8. [TODO](#TODO)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -245,7 +245,6 @@ And in your `web/index.html`:
 
 ##  8. <a name='TODO'></a>TODO
 
+- update quick start
 - add flutter example
 - publish to pub.dev
-- make sure APIs line up for web and android implementations
-- change method names to something better
