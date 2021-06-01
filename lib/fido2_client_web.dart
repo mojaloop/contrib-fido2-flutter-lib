@@ -1,6 +1,7 @@
 @JS()
 library fido2_client_plugin_web;
 
+import 'package:fido2_client/public_key_credential.dart';
 import 'package:js/js.dart';
 import 'package:js/js_util.dart';
 
@@ -21,18 +22,18 @@ class AuthenticatorResponse {
 
 @JS()
 @anonymous
-class PublicKeyCredential {
-  String id;
-  // todo: guessing how the types will be marshalled here...
-  List<ByteData> rawId;
+// class PublicKeyCredential {
+//   String id;
+//   // todo: guessing how the types will be marshalled here...
+//   List<ByteData> rawId;
 
-  // todo: guessing how the types will be marshalled here...
-  AuthenticatorResponse response;
-}
+//   // todo: guessing how the types will be marshalled here...
+//   AuthenticatorResponse response;
+// }
 
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
-external Future<List<int>> web_initiateRegistration(
+external Future<PublicKeyCredential> web_initiateRegistration(
     String challenge, String userId, Object options);
 @JS('initiateSigning')
 // ignore: non_constant_identifier_names
