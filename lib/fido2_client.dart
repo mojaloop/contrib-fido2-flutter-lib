@@ -60,10 +60,10 @@ class Fido2Client {
   /// Begins the FIDO registration process.
   ///
   /// This launches the FIDO client which authenticates the user associated with [userId]
-  /// and [username] via lock screen (which may have biometric or PIN methods) or
+  /// and [options.username] via lock screen (which may have biometric or PIN methods) or
   /// even external authenticators.
   ///
-  /// The [rpDomain] and [rpName] describe the Relying Party's
+  /// The [options.rpDomain] and [options.rpName] describe the Relying Party's
   /// domain and name.
   /// See: https://www.w3.org/TR/webauthn/#webauthn-relying-party
   ///
@@ -76,26 +76,17 @@ class Fido2Client {
   ///
   /// The [challenge] is used validation purposes by the WebAuthn server.
   ///
-  /// [coseAlgoValue] is the COSE identifier for the cryptographic algorithm that will be
+  /// [options.coseAlgoValue] is the COSE identifier for the cryptographic algorithm that will be
   /// used by the authenticator for keypair generation.
   /// See: https://www.iana.org/assignments/cose/cose.xhtml
   ///
   /// The method returns a [RegistrationResult] future that is completed after the
   /// user completes the authentication process.
   Future<RegistrationResult> initiateRegistration(
-      String challenge,
-      String userId,
-      String username,
-      String rpDomain,
-      String rpName,
-      int coseAlgoValue) async {
-    Map<String, dynamic> args = <String, dynamic>{};
+      String challenge, String userId, Map<String, dynamic> options) async {
+    Map<String, dynamic> args = options;
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('userId', () => userId);
-    args.putIfAbsent('username', () => username);
-    args.putIfAbsent('rpDomain', () => rpDomain);
-    args.putIfAbsent('rpName', () => rpName);
-    args.putIfAbsent('coseAlgoValue', () => coseAlgoValue);
     _channel.invokeMethod('initiateRegistration', args);
     return _regCompleter.future;
   }

@@ -17,8 +17,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String keyHandle; // Should be saved in shared pref
-  static const String regChallenge = "randomchallenge1231321"; // Should come from server
-  static const String signChallenge = "transaction12356678"; // Should come from server
+  static const String regChallenge =
+      "randomchallenge1231321"; // Should come from server
+  static const String signChallenge =
+      "transaction12356678"; // Should come from server
 
   String displayText = "Please sign or register to display auth results";
   static final String rpDomain = "webauthn-server-demo.herokuapp.com";
@@ -58,32 +60,50 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget buildRegButton() {
-    return RaisedButton(child: Text('FIDO Register'), onPressed: () async {
-      RegistrationResult res = await fidoClient.initiateRegistration(regChallenge, "kenkaizeng@gmail.com", "kkzeng", rpDomain, rpName, -7);
-      setState(() {
-        this.keyHandle = res.keyHandle;
+    return RaisedButton(
+      child: Text('FIDO Register'),
+      onPressed: () async {
+        Map<String, dynamic> options = {
+          'username': 'kkzeng',
+          'rpDomain': rpDomain,
+          'rpName': rpName,
+          'coseAlgoValue': -7
+        };
+        RegistrationResult res = await fidoClient.initiateRegistration(
+            regChallenge, "kenkaizeng@gmail.com", options);
+        setState(() {
+          this.keyHandle = res.keyHandle;
 
-        // Decoding the clientData to be JSON so that it is human readable
-        Uint8List decodedClientData = base64Url.decode(res.clientData);
-        String jsonFormat = utf8.decode(decodedClientData);
+          // Decoding the clientData to be JSON so that it is human readable
+          Uint8List decodedClientData = base64Url.decode(res.clientData);
+          String jsonFormat = utf8.decode(decodedClientData);
 
-        displayText = 'Challenge: \n$regChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n$jsonFormat\n\nAttestation obj: \n${res.attestationObj}';
-      });
-      print(displayText);
-    },);
+          displayText =
+              'Challenge: \n$regChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n$jsonFormat\n\nAttestation obj: \n${res.attestationObj}';
+        });
+        print(displayText);
+      },
+    );
   }
 
   Widget buildSignButton() {
-    return RaisedButton(child: Text('FIDO Sign'), onPressed:  keyHandle == null ? null : () async {
-      SigningResult res = await fidoClient.initiateSigning(keyHandle, signChallenge, rpDomain);
-      setState(() {
-        // Decoding the clientData to be JSON so that it is human readable
-        Uint8List decodedClientData = base64Url.decode(res.clientData);
-        String jsonFormat = utf8.decode(decodedClientData);
+    return RaisedButton(
+      child: Text('FIDO Sign'),
+      onPressed: keyHandle == null
+          ? null
+          : () async {
+              SigningResult res = await fidoClient.initiateSigning(
+                  keyHandle, signChallenge, rpDomain);
+              setState(() {
+                // Decoding the clientData to be JSON so that it is human readable
+                Uint8List decodedClientData = base64Url.decode(res.clientData);
+                String jsonFormat = utf8.decode(decodedClientData);
 
-        displayText = 'Challenge: \n$signChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n$jsonFormat\n\nauthData: \n${res.authData}\n\nSignature: \n${res.signature}';
-      });
-      print(displayText);
-    },);
+                displayText =
+                    'Challenge: \n$signChallenge\n\nKey handle: \n$keyHandle\n\nClient data: \n$jsonFormat\n\nauthData: \n${res.authData}\n\nSignature: \n${res.signature}';
+              });
+              print(displayText);
+            },
+    );
   }
 }
