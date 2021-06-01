@@ -114,7 +114,7 @@ Kicks off the signing process.
 |-------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 | `keyHandle` | `String` | The string identifier for the credential you are authenticating.  This should be the same as the output of the initial `initiateRegistration` |
 | `challenge` | `String` | The challenge string from the server to be signed by the FIDO client.                                                                         |
-| `rpDomain`  | `String` | The domain of the Relying Party. Same as the variable in `initiateRegistration`                                                               |
+| `rpDomain`  | `String` | The domain of the Relying Party. Same as the variable in `initiateRegistration`. Required for Android, optional for Web                       |
 
 ####  3.2.2. <a name='ReturnValues:-1'></a>Return Values:
 
@@ -199,8 +199,8 @@ dependencies:
   ...
   fido2_client:
     git:
-      url: git://github.com/mojaloop/fido2-client-plugin
-      ref: <some commit>
+      url: git://github.com/mojaloop/contrib-fido2-flutter-lib
+      ref: <some commit, or leave blank for master>
 ```
 
 > Note:

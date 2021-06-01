@@ -112,8 +112,8 @@ class Fido2Client {
   ///
   /// The method returns a [SigningResult] future that is completed after the
   /// user completes the authentication process.
-  Future<SigningResult> initiateSigning(
-      String keyHandle, String challenge, String rpDomain) async {
+  Future<SigningResult> initiateSigning(String keyHandle, String challenge,
+      [String rpDomain]) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('keyHandle', () => keyHandle);

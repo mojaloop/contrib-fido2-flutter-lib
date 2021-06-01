@@ -162,8 +162,8 @@ class Fido2ClientWeb {
   ///
   /// The method returns a [SigningResult] future that is completed after the
   /// user completes the authentication process.
-  Future<dynamic> initiateSigning(
-      List<dynamic> keyHandle, String challenge, String rpDomain) async {
+  Future<dynamic> initiateSigning(List<dynamic> keyHandle, String challenge,
+      [String rpDomain]) async {
     return promiseToFuture(web_initiateSigning(keyHandle, challenge, rpDomain));
   }
 }
