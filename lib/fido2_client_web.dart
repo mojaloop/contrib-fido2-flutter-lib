@@ -1,15 +1,11 @@
 @JS()
 library fido2_client_plugin_web;
 
-import 'dart:js';
-
 import 'package:fido2_client/public_key_credential.dart';
 import 'package:js/js.dart';
 import 'package:js/js_util.dart';
 
 import 'dart:async';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show window;
 
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -35,7 +31,7 @@ class AuthenticatorResponse {
 
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
-external Future<PublicKeyCredential> web_initiateRegistration(
+external dynamic web_initiateRegistration(
     String challenge, String userId, Object options);
 @JS('initiateSigning')
 // ignore: non_constant_identifier_names
@@ -142,8 +138,8 @@ class Fido2ClientWeb {
 
     // TODO: how do we marshall from the JS object to our PublicKeyCredential?
 
-    var jsPromise = web_initiateRegistration(challenge, userId, jsify(options));
-    var jsObject = await promiseToFuture<JsObject>(jsPromise);
+    var jsObject = await promiseToFuture(
+        web_initiateRegistration(challenge, userId, jsify(options)));
 
     print('here is jsObject: ' + jsObject.toString());
 
