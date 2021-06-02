@@ -1,17 +1,21 @@
 import 'dart:js';
 
 import 'package:fido2_client/authenticator_attestation_response.dart';
+import 'package:js/js.dart';
 
+@JS()
+@anonymous
 class PublicKeyCredential {
-  // PublicKeyCredential({this.id, this.response});
-  PublicKeyCredential({this.id});
+  List<int> id;
+  // // PublicKeyCredential({this.id, this.response});
+  // PublicKeyCredential({this.id});
 
-  static fromJSObject(dynamic jsObject) {
-    return new PublicKeyCredential(id: jsObject['id']);
-  }
+  // static fromJSObject(dynamic jsObject) {
+  //   return new PublicKeyCredential(id: jsObject['id']);
+  // }
 
-  // TODO: should this be an arraybuffer?
-  String id;
+  // // TODO: should this be an arraybuffer?
+  // String id;
   // AuthenticatorAttestationResponse response;
 
   // @override

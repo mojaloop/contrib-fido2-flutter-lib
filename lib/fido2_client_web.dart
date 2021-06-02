@@ -18,20 +18,9 @@ class AuthenticatorResponse {
   List<ByteData> clientDataJSON;
 }
 
-@JS()
-@anonymous
-class TestPublicKeyCredential {
-  List<int> id;
-  // // todo: guessing how the types will be marshalled here...
-  // List<ByteData> rawId;
-
-  // // todo: guessing how the types will be marshalled here...
-  // AuthenticatorResponse response;
-}
-
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
-external Future<TestPublicKeyCredential> web_initiateRegistration(
+external Future<PublicKeyCredential> web_initiateRegistration(
     String challenge, String userId, Object options);
 @JS('initiateSigning')
 // ignore: non_constant_identifier_names
@@ -138,12 +127,12 @@ class Fido2ClientWeb {
 
     // TODO: how do we marshall from the JS object to our PublicKeyCredential?
 
-    var jsObject = await promiseToFuture<TestPublicKeyCredential>(
+    var publicKeyCredential = await promiseToFuture<PublicKeyCredential>(
         web_initiateRegistration(challenge, userId, jsify(options)));
 
-    print('here is jsObject: ' + jsObject.id.toString());
+    print('here is jsObject: ' + publicKeyCredential.id.toString());
 
-    return PublicKeyCredential.fromJSObject(jsObject);
+    return publicKeyCredential;
   }
 
   /// Begins the FIDO signing process.
