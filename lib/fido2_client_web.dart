@@ -130,7 +130,7 @@ class Fido2ClientWeb {
     var publicKeyCredential = await promiseToFuture<PublicKeyCredential>(
         web_initiateRegistration(challenge, userId, jsify(options)));
 
-    print('here is jsObject: ' + publicKeyCredential.id.toString());
+    print('here is jsObject: ' + publicKeyCredential.toString());
 
     return publicKeyCredential;
   }

@@ -24,4 +24,16 @@ class PublicKeyCredential {
 
   // @override
   // Map<String, dynamic> toJson() => _$PublicKeyCredentialToJson(this);
+
+  dynamic toJson() => {
+        'id': id,
+        // 'name': name,
+        // 'email': email,
+        // 'token': token
+      };
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
 }
