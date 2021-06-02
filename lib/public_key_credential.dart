@@ -9,35 +9,6 @@ import 'package:js/js.dart';
 @anonymous
 class PublicKeyCredentialJS {
   List<int> id;
-  // // PublicKeyCredential({this.id, this.response});
-  // PublicKeyCredential({this.id});
-
-  // static fromJSObject(dynamic jsObject) {
-  //   return new PublicKeyCredential(id: jsObject['id']);
-  // }
-
-  // // TODO: should this be an arraybuffer?
-  // String id;
-  // AuthenticatorAttestationResponse response;
-
-  // @override
-  // factory PublicKeyCredential.fromJson(Map<String, dynamic> json) =>
-  //     _$PublicKeyCredentialFromJson(json);
-
-  // @override
-  // Map<String, dynamic> toJson() => _$PublicKeyCredentialToJson(this);
-
-  // dynamic toJson() => {
-  //       'id': id,
-  //       // 'name': name,
-  //       // 'email': email,
-  //       // 'token': token
-  //     };
-
-  // @override
-  // String toString() {
-  //   return toJson().toString();
-  // }
 }
 
 /// Native PublicKeyCredential in Dart Land
@@ -46,11 +17,17 @@ class PublicKeyCredential {
 
   PublicKeyCredential({this.id});
 
-  static fromPublicKeyCredentialJS(PublicKeyCredentialJS credential) {
+  static fromJs(PublicKeyCredentialJS credential) {
     return new PublicKeyCredential(id: credential.id);
   }
 
-  dynamic toJson() => {
+  static fromJson(Map<String, dynamic> json) {
+    return PublicKeyCredential(
+      id: json['id'] as List<int>,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
         'id': id,
         // 'name': name,
         // 'email': email,

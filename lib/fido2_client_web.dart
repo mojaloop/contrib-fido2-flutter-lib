@@ -122,10 +122,7 @@ class Fido2ClientWeb {
         web_initiateRegistration(challenge, userId, jsify(options)));
 
     // convert to a native, dart representation for better control
-    var publicKeyCredential =
-        PublicKeyCredential.fromPublicKeyCredentialJS(publicKeyCredentialJS);
-    print('here is jsObject: ' + publicKeyCredential.toString());
-    return publicKeyCredential;
+    return PublicKeyCredential.fromJs(publicKeyCredentialJS);
   }
 
   /// Begins the FIDO signing process.
