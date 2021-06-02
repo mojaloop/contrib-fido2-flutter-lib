@@ -1,6 +1,3 @@
-import 'dart:js';
-
-import 'package:fido2_client/authenticator_attestation_response.dart';
 import 'package:js/js.dart';
 
 /// External PublicKeyCredential in JS Land
@@ -21,9 +18,10 @@ class PublicKeyCredential {
     return new PublicKeyCredential(id: credential.id);
   }
 
-  static fromJson(Map<String, dynamic> json) {
+  static PublicKeyCredential fromJson(Map<String, dynamic> json) {
     return PublicKeyCredential(
       id: json['id'] as List<int>,
+      // TODO
     );
   }
 
