@@ -117,16 +117,6 @@ class Fido2ClientWeb {
   /// user completes the authentication process.
   Future<PublicKeyCredential> initiateRegistration(
       String challenge, String userId, Map<String, dynamic> options) async {
-    // TODO: remove
-    // html.window.console.log('Fido2ClientWeb initiateRegistration with ' +
-    //     challenge +
-    //     ' ' +
-    //     userId +
-    //     ' and options: ' +
-    //     options.toString());
-
-    // TODO: how do we marshall from the JS object to our PublicKeyCredential?
-
     var publicKeyCredential = await promiseToFuture<PublicKeyCredential>(
         web_initiateRegistration(challenge, userId, jsify(options)));
 
