@@ -117,11 +117,14 @@ class Fido2ClientWeb {
   /// user completes the authentication process.
   Future<PublicKeyCredential> initiateRegistration(
       String challenge, String userId, Map<String, dynamic> options) async {
-    var publicKeyCredential = await promiseToFuture<PublicKeyCredential>(
+    // JS Interop marshalls everything for us, but it is still 'external'
+    var publicKeyCredentialJS = await promiseToFuture<PublicKeyCredentialJS>(
         web_initiateRegistration(challenge, userId, jsify(options)));
 
+    // convert to a native, dart representation for better control
+    var publicKeyCredential =
+        PublicKeyCredential.fromPublicKeyCredentialJS(publicKeyCredentialJS);
     print('here is jsObject: ' + publicKeyCredential.toString());
-
     return publicKeyCredential;
   }
 
