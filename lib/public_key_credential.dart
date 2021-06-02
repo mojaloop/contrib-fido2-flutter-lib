@@ -25,12 +25,24 @@ class PublicKeyCredential {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        // 'name': name,
-        // 'email': email,
-        // 'token': token
-      };
+  Map<String, dynamic> toJson() {
+    final val = <String, dynamic>{};
+
+    void writeNotNull(String key, dynamic value) {
+      if (value != null) {
+        val[key] = value;
+      }
+    }
+
+    writeNotNull('id', this.id);
+    return val;
+  }
+
+  //   'id': id,
+  //   // 'name': name,
+  //   // 'email': email,
+  //   // 'token': token
+  // };
 
   @override
   String toString() {
