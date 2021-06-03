@@ -45,7 +45,7 @@ function str2ab(str) {
  *     attestation: 'direct'
  *   }
  *
- * @returns {Promise<Array<int>>} - the credentialId
+ * @returns {Promise<PublicKeyCredential>}
  */
 async function initiateRegistration(challenge, userId, options) {
   if (!challenge || !userId) {
@@ -92,9 +92,12 @@ async function initiateRegistration(challenge, userId, options) {
   const clientDataJSON = new Uint8Array(credential.response.clientDataJSON)
 
   return {
+    
     id: credential.id,
     rawId,
     response: {
+      // we add type here to help Dart to convert to the right type
+      type: 'AuthenticatorAttestationResponse',
       attestationObject,
       clientDataJSON,
     }
@@ -108,9 +111,9 @@ async function initiateRegistration(challenge, userId, options) {
  * @param challenge - the challenge provided by the Relying Party
  * @param rpId - _Optional_ the domain string of the Relying Party
  * 
- * @returns {Promise<unknown>} - promise returned from navigator.crentials.create
+ * @returns {Promise<PublicKeyCredential>} - promise returned from navigator.crentials.create
  */
-function initiateSigning(keyHandleId, challenge, rpId) {
+async function initiateSigning(keyHandleId, challenge, rpId) {
   if (!keyHandleId || !challenge) {
     throw new Error('keyHandle and challenge must be defined')
   }
@@ -119,7 +122,6 @@ function initiateSigning(keyHandleId, challenge, rpId) {
     challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
     allowCredentials: [{
       id: Uint8Array.from(keyHandleId, c => c),
-      // id: keyHandleId,
       type: 'public-key',
       // TODO: expose this to the client library.
       // transports: ['usb', 'ble', 'nfc'],
@@ -133,7 +135,7 @@ function initiateSigning(keyHandleId, challenge, rpId) {
 
   console.log(`calling window.navigator.credentials.get with options:\n ${JSON.stringify(publicKeyCredentialRequestOptions)}`)
 
-  const assertion = await navigator.credentials.get({
+  const assertion = await window.navigator.credentials.get({
     publicKey: publicKeyCredentialRequestOptions
   });
 
@@ -149,6 +151,8 @@ function initiateSigning(keyHandleId, challenge, rpId) {
     id: assertion.id,
     rawId,
     response: {
+      // we add type here to help Dart to convert to the right type
+      type: 'AuthenticatorAssertionResponse',
       authenticatorData,
       clientDataJSON,
       signature,

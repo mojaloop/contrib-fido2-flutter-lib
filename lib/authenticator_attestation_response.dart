@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:fido2_client/authenticator_response.dart';
 import 'package:fido2_client/public_key_credential.dart';
 import 'package:js/js.dart';
 

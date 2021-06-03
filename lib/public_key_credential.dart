@@ -1,54 +1,16 @@
 import 'dart:js';
 
-import 'package:fido2_client/authenticator_assertion_response.dart';
-import 'package:fido2_client/authenticator_attestation_response.dart';
+import 'package:fido2_client/authenticator_response.dart';
 import 'package:js/js.dart';
-
-/// Can either be a AuthenticatorAssertionResponse, or
-/// a AuthenticatorAttestationResponse
-abstract class AuthenticatorResponse {
-  static AuthenticatorResponse fromJs(dynamic someResponseJs) {
-    if (someResponseJs.hasProperty('attestationObject')) {
-      // This must be a AuthenticatorAttestationResponse
-      return AuthenticatorAttestationResponse.fromJs(
-          someResponseJs as AuthenticatorAttestationResponseJS);
-    }
-
-    if (someResponseJs.hasProperty('authenticatorData')) {
-      // This must be a AuthenticatorAssertionResponse
-      return AuthenticatorAssertionResponse.fromJs(
-          someResponseJs as AuthenticatorAssertionResponseJS);
-    }
-
-    throw new Exception(
-        'Neither attestationObject nor authenticatorData found on jsobject. Failed to decode AuthenticatorResponse');
-  }
-
-  static AuthenticatorResponse fromJson(Map<String, dynamic> json) {
-    if (json['attestationObject']) {
-      // This must be a AuthenticatorAttestationResponse
-      return AuthenticatorAttestationResponse.fromJson(json);
-    }
-    if (json['authenticatorData']) {
-      // This must be a AuthenticatorAssertionResponse
-      return AuthenticatorAssertionResponse.fromJson(json);
-    }
-
-    throw new Exception(
-        'Neither attestationObject nor authenticatorData found on json. Failed to decode JSON');
-  }
-
-  Map<String, dynamic> toJson();
-}
 
 /// External PublicKeyCredential in JS Land
 ///
 @JS()
 @anonymous
-class PublicKeyCredentialJS<T> {
+class PublicKeyCredentialJS {
   String id;
   List<int> rawId;
-  T response;
+  AuthenticatorResponseJS response;
 }
 
 /// Native PublicKeyCredential in Dart Land

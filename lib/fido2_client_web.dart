@@ -19,6 +19,7 @@ import 'authenticator_error.dart';
 // ignore: non_constant_identifier_names
 external Future<PublicKeyCredential> web_initiateRegistration(
     String challenge, String userId, Object options);
+
 @JS('initiateSigning')
 // ignore: non_constant_identifier_names
 external web_initiateSigning(
@@ -146,8 +147,9 @@ class Fido2ClientWeb {
   Future<PublicKeyCredential> initiateSigning(
       List<dynamic> keyHandle, String challenge,
       [String rpDomain]) async {
-    var publicKeyCredentialJs = await promiseToFuture(
+    var publicKeyCredentialJS = await promiseToFuture(
         web_initiateSigning(keyHandle, challenge, rpDomain));
-    return PublicKeyCredential.fromJs(publicKeyCredentialJs);
+
+    return PublicKeyCredential.fromJs(publicKeyCredentialJS);
   }
 }
