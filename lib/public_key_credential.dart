@@ -1,21 +1,61 @@
+import 'dart:js';
+
+import 'package:fido2_client/authenticator_assertion_response.dart';
 import 'package:fido2_client/authenticator_attestation_response.dart';
 import 'package:js/js.dart';
+
+/// Can either be a AuthenticatorAssertionResponse, or
+/// a AuthenticatorAttestationResponse
+abstract class AuthenticatorResponse {
+  static AuthenticatorResponse fromJs(dynamic someResponseJs) {
+    if (someResponseJs.hasProperty('attestationObject')) {
+      // This must be a AuthenticatorAttestationResponse
+      return AuthenticatorAttestationResponse.fromJs(
+          someResponseJs as AuthenticatorAttestationResponseJS);
+    }
+
+    if (someResponseJs.hasProperty('authenticatorData')) {
+      // This must be a AuthenticatorAssertionResponse
+      return AuthenticatorAssertionResponse.fromJs(
+          someResponseJs as AuthenticatorAssertionResponseJS);
+    }
+
+    throw new Exception(
+        'Neither attestationObject nor authenticatorData found on jsobject. Failed to decode AuthenticatorResponse');
+  }
+
+  static AuthenticatorResponse fromJson(Map<String, dynamic> json) {
+    if (json['attestationObject']) {
+      // This must be a AuthenticatorAttestationResponse
+      return AuthenticatorAttestationResponse.fromJson(json);
+    }
+    if (json['authenticatorData']) {
+      // This must be a AuthenticatorAssertionResponse
+      return AuthenticatorAssertionResponse.fromJson(json);
+    }
+
+    throw new Exception(
+        'Neither attestationObject nor authenticatorData found on json. Failed to decode JSON');
+  }
+
+  Map<String, dynamic> toJson();
+}
 
 /// External PublicKeyCredential in JS Land
 ///
 @JS()
 @anonymous
-class PublicKeyCredentialJS {
+class PublicKeyCredentialJS<T> {
   String id;
   List<int> rawId;
-  AuthenticatorAttestationResponseJS response;
+  T response;
 }
 
 /// Native PublicKeyCredential in Dart Land
 class PublicKeyCredential {
   String id;
   List<int> rawId;
-  AuthenticatorAttestationResponse response;
+  AuthenticatorResponse response;
 
   PublicKeyCredential({this.id, this.rawId, this.response});
 
@@ -23,7 +63,7 @@ class PublicKeyCredential {
     return new PublicKeyCredential(
         id: credential.id,
         rawId: credential.rawId,
-        response: AuthenticatorAttestationResponse.fromJs(credential.response));
+        response: AuthenticatorResponse.fromJs(credential.response));
   }
 
   static PublicKeyCredential fromJson(Map<String, dynamic> json) {
@@ -32,7 +72,7 @@ class PublicKeyCredential {
         rawId: (json['rawId'] as List)?.map((i) => i as int)?.toList(),
         response: json['response'] == null
             ? null
-            : AuthenticatorAttestationResponse.fromJson(
+            : AuthenticatorResponse.fromJson(
                 json['response'] as Map<String, dynamic>));
   }
 

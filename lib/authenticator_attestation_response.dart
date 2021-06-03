@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:fido2_client/public_key_credential.dart';
 import 'package:js/js.dart';
 
 @JS()
@@ -9,7 +10,7 @@ class AuthenticatorAttestationResponseJS {
   Uint8List clientDataJSON;
 }
 
-class AuthenticatorAttestationResponse {
+class AuthenticatorAttestationResponse extends AuthenticatorResponse {
   List<int> attestationObject;
   List<int> clientDataJSON;
 
@@ -18,7 +19,8 @@ class AuthenticatorAttestationResponse {
     this.attestationObject,
   });
 
-  static fromJs(AuthenticatorAttestationResponseJS js) {
+  static AuthenticatorAttestationResponse fromJs(
+      AuthenticatorAttestationResponseJS js) {
     return new AuthenticatorAttestationResponse(
         attestationObject: js.attestationObject,
         clientDataJSON: js.clientDataJSON);

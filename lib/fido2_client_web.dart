@@ -1,6 +1,7 @@
 @JS()
 library fido2_client_plugin_web;
 
+import 'package:fido2_client/authenticator_attestation_response.dart';
 import 'package:fido2_client/public_key_credential.dart';
 import 'package:js/js.dart';
 import 'package:js/js_util.dart';
@@ -13,10 +14,6 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:fido2_client/registration_result.dart';
 import 'package:fido2_client/signing_result.dart';
 import 'authenticator_error.dart';
-
-class AuthenticatorResponse {
-  List<ByteData> clientDataJSON;
-}
 
 @JS('initiateRegistration')
 // ignore: non_constant_identifier_names
@@ -146,8 +143,11 @@ class Fido2ClientWeb {
   ///
   /// The method returns a [SigningResult] future that is completed after the
   /// user completes the authentication process.
-  Future<dynamic> initiateSigning(List<dynamic> keyHandle, String challenge,
+  Future<PublicKeyCredential> initiateSigning(
+      List<dynamic> keyHandle, String challenge,
       [String rpDomain]) async {
-    return promiseToFuture(web_initiateSigning(keyHandle, challenge, rpDomain));
+    var publicKeyCredentialJs = await promiseToFuture(
+        web_initiateSigning(keyHandle, challenge, rpDomain));
+    return PublicKeyCredential.fromJs(publicKeyCredentialJs);
   }
 }

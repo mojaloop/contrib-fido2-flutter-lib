@@ -133,7 +133,26 @@ function initiateSigning(keyHandleId, challenge, rpId) {
 
   console.log(`calling window.navigator.credentials.get with options:\n ${JSON.stringify(publicKeyCredentialRequestOptions)}`)
 
-  return navigator.credentials.get({
+  const assertion = await navigator.credentials.get({
     publicKey: publicKeyCredentialRequestOptions
   });
+
+  // convert from ArrayBuffers here since Dart's JS interop has problems with
+  // marshalling a NativeByteBuffer
+  const rawId = new Uint8Array(assertion.rawId)
+  const authenticatorData = new Uint8Array(assertion.response.authenticatorData)
+  const clientDataJSON = new Uint8Array(assertion.response.clientDataJSON)
+  const signature = new Uint8Array(assertion.response.signature)
+  const userHandle = new Uint8Array(assertion.response.userHandle)
+
+  return {
+    id: assertion.id,
+    rawId,
+    response: {
+      authenticatorData,
+      clientDataJSON,
+      signature,
+      userHandle,
+    }
+  }
  }
