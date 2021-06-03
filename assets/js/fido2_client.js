@@ -93,7 +93,8 @@ async function initiateRegistration(challenge, userId, options) {
     {publicKey: credentialCreationOptions}
   )
 
-  console.log(`credential is:`, credential)
+  console.log(`credential is: ` + JSON.stringify(credential))
+  console.log(`credential.response is: ` + JSON.stringify(credential.response))
 
   const utf8Decoder = new TextDecoder('utf-8');
   const decodedClientData = utf8Decoder.decode(
@@ -123,9 +124,10 @@ async function initiateRegistration(challenge, userId, options) {
     55, 55 + credentialIdLength);
 
   return {
+
     id: credentialId,
       // TODO: also return the attestation object 
-    response: null
+    response: credential.response
   }
 }
 

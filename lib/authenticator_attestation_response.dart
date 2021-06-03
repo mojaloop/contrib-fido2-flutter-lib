@@ -1,22 +1,49 @@
+import 'package:js/js.dart';
+
+@JS()
+@anonymous
+class AuthenticatorAttestationResponseJS {
+  List<dynamic> attestationObject;
+  List<dynamic> clientDataJSON;
+}
+
 class AuthenticatorAttestationResponse {
+  List<dynamic> attestationObject;
+  List<dynamic> clientDataJSON;
+
   AuthenticatorAttestationResponse({
     this.clientDataJSON,
     this.attestationObject,
-    this.publicKey,
-    this.publicKeyAlgorithm,
   });
 
-  dynamic clientDataJSON;
-  String attestationObject;
-  String publicKey;
-  String publicKeyAlgorithm;
+  static fromJs(AuthenticatorAttestationResponseJS js) {
+    return new AuthenticatorAttestationResponse(
+        attestationObject: js.attestationObject,
+        clientDataJSON: js.clientDataJSON);
+  }
 
-  // @override
-  // factory AuthenticatorAttestationResponse.fromJson(
-  //         Map<String, dynamic> json) =>
-  //     _$AuthenticatorAttestationResponseFromJson(json);
+  static AuthenticatorAttestationResponse fromJson(Map<String, dynamic> json) {
+    return AuthenticatorAttestationResponse(
+        attestationObject: (json['attestationObject'] as List),
+        clientDataJSON: (json['clientDataJSON'] as List));
+  }
 
-  // @override
-  // Map<String, dynamic> toJson() =>
-  //     _$AuthenticatorAttestationResponseToJson(this);
+  Map<String, dynamic> toJson() {
+    final val = <String, dynamic>{};
+
+    void writeNotNull(String key, dynamic value) {
+      if (value != null) {
+        val[key] = value;
+      }
+    }
+
+    writeNotNull('attestationObject', this.attestationObject);
+    writeNotNull('clientDataJSON', this.clientDataJSON);
+    return val;
+  }
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
 }

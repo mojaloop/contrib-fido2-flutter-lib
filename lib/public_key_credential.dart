@@ -1,3 +1,4 @@
+import 'package:fido2_client/authenticator_attestation_response.dart';
 import 'package:js/js.dart';
 
 /// External PublicKeyCredential in JS Land
@@ -5,24 +6,34 @@ import 'package:js/js.dart';
 @JS()
 @anonymous
 class PublicKeyCredentialJS {
-  List<int> id;
+  String id;
+  List<int> rawId;
+  AuthenticatorAttestationResponseJS response;
 }
 
 /// Native PublicKeyCredential in Dart Land
 class PublicKeyCredential {
-  List<int> id;
+  String id;
+  List<int> rawId;
+  AuthenticatorAttestationResponse response;
 
-  PublicKeyCredential({this.id});
+  PublicKeyCredential({this.id, this.rawId, this.response});
 
   static fromJs(PublicKeyCredentialJS credential) {
-    return new PublicKeyCredential(id: credential.id);
+    return new PublicKeyCredential(
+        id: credential.id,
+        rawId: credential.rawId,
+        response: AuthenticatorAttestationResponse.fromJs(credential.response));
   }
 
   static PublicKeyCredential fromJson(Map<String, dynamic> json) {
     return PublicKeyCredential(
-      id: json['id'] as List<int>,
-      // TODO
-    );
+        id: (json['id'] as String),
+        rawId: (json['rawId'] as List)?.map((i) => i as int)?.toList(),
+        response: json['response'] == null
+            ? null
+            : AuthenticatorAttestationResponse.fromJson(
+                json['response'] as Map<String, dynamic>));
   }
 
   Map<String, dynamic> toJson() {
@@ -35,14 +46,10 @@ class PublicKeyCredential {
     }
 
     writeNotNull('id', this.id);
+    writeNotNull('rawId', this.rawId);
+    writeNotNull('response', this.response.toJson());
     return val;
   }
-
-  //   'id': id,
-  //   // 'name': name,
-  //   // 'email': email,
-  //   // 'token': token
-  // };
 
   @override
   String toString() {
