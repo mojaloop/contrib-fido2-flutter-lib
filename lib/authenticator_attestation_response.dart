@@ -1,10 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:js/js.dart';
 
 @JS()
 @anonymous
 class AuthenticatorAttestationResponseJS {
-  List<int> attestationObject;
-  List<int> clientDataJSON;
+  Uint8List attestationObject;
+  Uint8List clientDataJSON;
 }
 
 class AuthenticatorAttestationResponse {

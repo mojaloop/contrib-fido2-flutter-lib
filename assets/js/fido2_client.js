@@ -81,56 +81,23 @@ async function initiateRegistration(challenge, userId, options) {
 
   console.log(`calling window.navigator.credentials.create with options:\n ${JSON.stringify(credentialCreationOptions)}`)
 
-  // Note:
-  // The following would ideally be done inside of the Dart code
-  // but I'm not good enough at dart and navigating the Dart/JS
-  // interop tools to do this well. 
-  //
-  // For now, we'll just work on returning the credentialId and 
-  // attestation object so we can get the demos working.
-  // A more complete library would be much smarter about this
   const credential = await window.navigator.credentials.create(
     {publicKey: credentialCreationOptions}
   )
-
-  console.log(`credential is: ` + JSON.stringify(credential))
-  console.log('credential.rawId is: ' + JSON.stringify(credential.rawId))
-  console.log(`credential.response is: ` + JSON.stringify(credential.response))
-
-  const utf8Decoder = new TextDecoder('utf-8');
-  const decodedClientData = utf8Decoder.decode(
-    credential.response.clientDataJSON)
-
-  // parse the string as an object
-  const clientDataObj = JSON.parse(decodedClientData);
-  console.log(clientDataObj)
-
-  const decodedAttestationObj = CBOR.decode(
-    credential.response.attestationObject)
-
-  console.log('decoded Object: ' + decodedAttestationObj)
-
-  const { authData } = decodedAttestationObj
-  // get the length of the credential ID
-  const dataView = new DataView(
-    new ArrayBuffer(2));
-  const idLenBytes = authData.slice(53, 55);
-  idLenBytes.forEach(
-    (value, index) => dataView.setUint8(
-      index, value));
-  const credentialIdLength = dataView.getUint16();
-
-  // TODO: we don't need to do this... we should just be able to return the credential
-  // get the credential ID
-  const credentialId = authData.slice(
-    55, 55 + credentialIdLength);
-
+  
+  // convert from ArrayBuffers here since Dart's JS interop has problems with
+  // marshalling a NativeByteBuffer
+  const rawId = new Uint8Array(credential.rawId)
+  const attestationObject = new Uint8Array(credential.response.attestationObject)
+  const clientDataJSON = new Uint8Array(credential.response.clientDataJSON)
 
   return {
     id: credential.id,
-    rawId: credentialId,
-      // TODO: also return the attestation object 
-    response: credential.response
+    rawId,
+    response: {
+      attestationObject,
+      clientDataJSON,
+    }
   }
 }
 
