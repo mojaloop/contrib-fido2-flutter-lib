@@ -94,6 +94,7 @@ async function initiateRegistration(challenge, userId, options) {
   )
 
   console.log(`credential is: ` + JSON.stringify(credential))
+  console.log('credential.rawId is: ' + JSON.stringify(credential.rawId))
   console.log(`credential.response is: ` + JSON.stringify(credential.response))
 
   const utf8Decoder = new TextDecoder('utf-8');
@@ -119,13 +120,15 @@ async function initiateRegistration(challenge, userId, options) {
       index, value));
   const credentialIdLength = dataView.getUint16();
 
+  // TODO: we don't need to do this... we should just be able to return the credential
   // get the credential ID
   const credentialId = authData.slice(
     55, 55 + credentialIdLength);
 
-  return {
 
-    id: credentialId,
+  return {
+    id: credential.id,
+    rawId: credentialId,
       // TODO: also return the attestation object 
     response: credential.response
   }
