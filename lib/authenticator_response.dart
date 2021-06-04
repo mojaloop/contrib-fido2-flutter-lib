@@ -30,11 +30,11 @@ abstract class AuthenticatorResponse {
   }
 
   static AuthenticatorResponse fromJson(Map<String, dynamic> json) {
-    if (json['attestationObject']) {
+    if (json['attestationObject'] != null) {
       // This must be a AuthenticatorAttestationResponse
       return AuthenticatorAttestationResponse.fromJson(json);
     }
-    if (json['authenticatorData']) {
+    if (json['authenticatorData'] != null) {
       // This must be a AuthenticatorAssertionResponse
       return AuthenticatorAssertionResponse.fromJson(json);
     }
