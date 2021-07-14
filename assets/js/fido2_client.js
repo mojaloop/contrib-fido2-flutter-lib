@@ -119,7 +119,8 @@ async function initiateSigning(keyHandleId, challenge, rpId) {
   }
 
   const publicKeyCredentialRequestOptions = {
-    challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
+    // challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
+    challenge: Uint8Array.from(challenge, c => c),
     allowCredentials: [{
       id: Uint8Array.from(keyHandleId, c => c),
       type: 'public-key',
