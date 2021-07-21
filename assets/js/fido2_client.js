@@ -57,7 +57,8 @@ async function initiateRegistration(challenge, userId, options) {
   }
 
   const credentialCreationOptions = {
-    challenge: str2ab(challenge),
+    // challenge: str2ab(challenge),
+    challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
     rp: options.rp || {
       id: 'pineapplepay.moja-lab.live',
       name: 'Pineapple Pay'
