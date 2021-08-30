@@ -200,11 +200,11 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         when (resultCode) {
             RESULT_OK -> {
-                data?.let {
-                    if (it.hasExtra(Fido.FIDO2_KEY_ERROR_EXTRA)) {
-                        handleErrorResponse(requestCode, it.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA))
-                    } else if (it.hasExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)) {
-                        val fido2Response = it.getByteArrayExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)
+                if (data != null){
+                    if (data.hasExtra(Fido.FIDO2_KEY_ERROR_EXTRA)) {
+                        handleErrorResponse(requestCode, data.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA))
+                    } else if (data.hasExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)) {
+                        val fido2Response = data.getByteArrayExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)
                         when (requestCode) {
                             REGISTER_REQUEST_CODE -> processRegisterResponse(fido2Response)
                             SIGN_REQUEST_CODE -> processSigningResponse(fido2Response)
