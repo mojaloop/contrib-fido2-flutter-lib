@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:fido2_client/registration_result.dart';
 import 'package:fido2_client/signing_result.dart';
 import 'package:flutter/services.dart';
@@ -87,7 +88,7 @@ class Fido2Client {
     Map<String, dynamic> args = options;
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('userId', () => userId);
-    _channel.invokeMethod('initiateRegistration', args);
+    await _channel.invokeMethod('initiateRegistration', args);
     return _regCompleter.future;
   }
 

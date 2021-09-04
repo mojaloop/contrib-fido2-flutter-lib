@@ -1,0 +1,7 @@
+<resources>
+    <string name="asset_statements" translatable="false">
+        [{
+        \"include\": \"https://c4cd-105-112-30-239.ngrok.io/.well-known/assetlinks.json\"
+        }]
+    </string>
+</resources>

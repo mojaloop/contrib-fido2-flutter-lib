@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
           'username': 'kkzeng',
           'rpDomain': rpDomain,
           'rpName': rpName,
-          'coseAlgoValue': [-7].toList()
+          'coseAlgoValue': "-7"
         };
         RegistrationResult res = await fidoClient.initiateRegistration(
             regChallenge, "kenkaizeng@gmail.com", options);
