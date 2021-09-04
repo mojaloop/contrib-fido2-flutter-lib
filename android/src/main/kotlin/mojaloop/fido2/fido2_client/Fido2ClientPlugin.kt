@@ -85,8 +85,8 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     val username = call.argument<String>("username")!!
                     val rpDomain = call.argument<String>("rpDomain")!!
                     val rpName = call.argument<String>("rpName")!!
-                    val coseAlgoValue = call.argument<Int>("coseAlgoValue")!!
-                    initiateRegistration(result, challenge, userId, username, rpDomain, rpName, coseAlgoValue)
+                    val coseAlgoValue = call.argument<String>("coseAlgoValue")!!
+                    initiateRegistration(result, challenge, userId, username, rpDomain, rpName, coseAlgoValue.split(",").map{it.toInt()})
                 }
                 catch (e: NullPointerException) {
                     val errCode = "MISSING_ARGUMENTS"
@@ -113,7 +113,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateRegistration(result: Result, challenge: String, userId: String, username: String, rpDomain: String, rpName: String, coseAlgoValue: Int) {
+    private fun initiateRegistration(result: Result, challenge: String, userId: String, username: String, rpDomain: String, rpName: String, coseAlgoValue: List<Int>) {
         val rpEntity = PublicKeyCredentialRpEntity(rpDomain, rpName, null)
         val options = PublicKeyCredentialCreationOptions.Builder()
                 .setRp(rpEntity)
@@ -127,12 +127,12 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                 )
                 .setChallenge(challenge.decodeBase64())
                 .setParameters(
-                        listOf(
-                                PublicKeyCredentialParameters(
-                                        PublicKeyCredentialType.PUBLIC_KEY.toString(),
-                                        coseAlgoValue
-                                )
-                        )
+                        coseAlgoValue.map {
+                            PublicKeyCredentialParameters(
+                                    PublicKeyCredentialType.PUBLIC_KEY.toString(),
+                                    it
+                            )
+                        }
                 )
                 .build()
 
