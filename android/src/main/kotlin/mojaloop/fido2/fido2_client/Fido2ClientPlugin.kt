@@ -202,9 +202,9 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
             RESULT_OK -> {
                 if (data != null){
                     if (data.hasExtra(Fido.FIDO2_KEY_ERROR_EXTRA)) {
-                        handleErrorResponse(requestCode, data.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA))
+                        handleErrorResponse(requestCode, data.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA)!!)
                     } else if (data.hasExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)) {
-                        val fido2Response = data.getByteArrayExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)
+                        val fido2Response = data.getByteArrayExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)!!
                         when (requestCode) {
                             REGISTER_REQUEST_CODE -> processRegisterResponse(fido2Response)
                             SIGN_REQUEST_CODE -> processSigningResponse(fido2Response)
