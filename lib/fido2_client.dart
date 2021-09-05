@@ -88,7 +88,7 @@ class Fido2Client {
     Map<String, dynamic> args = options;
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('userId', () => userId);
-    await _channel.invokeMethod('initiateRegistration', args);
+    _channel.invokeMethod('initiateRegistration', args);
     return _regCompleter.future;
   }
 
