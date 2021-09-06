@@ -225,6 +225,20 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     SIGN_REQUEST_CODE -> channel.invokeMethod("onSignAuthError", args)
                 }
             }
+
+            else -> {
+                val errorName = "FIDO_PROCESS_INTERRUPTED"
+                val errorMessage = "Unhandled result code"
+
+                val args = HashMap<String, String>()
+                args["errorName"] = errorName
+                args["errorMsg"] = errorMessage
+
+                when (requestCode) {
+                    REGISTER_REQUEST_CODE -> channel.invokeMethod("onRegAuthError", args)
+                    SIGN_REQUEST_CODE -> channel.invokeMethod("onSignAuthError", args)
+                }
+            }
         }
         return true
     }
