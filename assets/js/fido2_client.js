@@ -139,6 +139,9 @@ async function initiateSigning(keyHandleId, challenge, rpId) {
   const assertion = await window.navigator.credentials.get({
     publicKey: publicKeyCredentialRequestOptions
   });
+  
+
+  console.log('assertion is', JSON.stringify(assertion))
 
   // convert from ArrayBuffers here since Dart's JS interop has problems with
   // marshalling a NativeByteBuffer
