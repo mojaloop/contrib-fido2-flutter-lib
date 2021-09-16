@@ -122,7 +122,9 @@ async function initiateSigning(keyHandleId, challenge, rpId) {
   const publicKeyCredentialRequestOptions = {
     challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
     allowCredentials: [{
-      id: Uint8Array.from(keyHandleId, c => c),
+      // id: Uint8Array.from(keyHandleId, c => c),
+      // Tmp test out a different approach here...
+      id: Uint8Array.from('vwWPva1iiTJIk/c7n9a49spEtJZBqrn4SECerci0b+Ue+6Jv9/DZo3rNX02Lq5PU4N5kGlkEPAkIoZ3499AzWQ==', c => c.charCodeAt(0)),
       type: 'public-key',
       // TODO: expose this to the client library.
       // transports: ['usb', 'ble', 'nfc'],
