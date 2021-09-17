@@ -119,7 +119,8 @@ async function initiateSigning(keyHandleId, challenge, rpId) {
     throw new Error('keyHandle and challenge must be defined')
   }
 
-  const localKeyHandleId = atob('vwWPva1iiTJIk/c7n9a49spEtJZBqrn4SECerci0b+Ue+6Jv9/DZo3rNX02Lq5PU4N5kGlkEPAkIoZ3499AzWQ==');
+  // const localKeyHandleId = atob('vwWPva1iiTJIk/c7n9a49spEtJZBqrn4SECerci0b+Ue+6Jv9/DZo3rNX02Lq5PU4N5kGlkEPAkIoZ3499AzWQ==');
+  const localKeyHandleId = atob('dhRwSpPOO7Zz2q8GEmoGmS6ytE3F9OKSAQ/SmkhkKRM15qjUUHAbnzU8vvYIXGyph6dHQpUsp8eOZCviiDv58Q==');
   const id = Uint8Array.from(localKeyHandleId, c => c.charCodeAt(0));
 
   const publicKeyCredentialRequestOptions = {
