@@ -99,7 +99,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     val keyHandleBase64 = call.argument<String>("keyHandle")!!
                     val challenge = call.argument<String>("challenge")!!
                     val rpDomain = call.argument<String>("rpDomain")!!
-                    initiateSigning(result, keyHandleBase64, challenge, rpDomain)
+                    initiateSigning(result, keyHandleBase64.trim().split(","), challenge, rpDomain)
                 }
                 catch (e: NullPointerException) {
                     val errCode = "MISSING_ARGUMENTS"
@@ -134,6 +134,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                             )
                         }
                 )
+            .setAuthenticatorSelection(AuthenticatorSelectionCriteria.Builder().setAttachment(Attachment.PLATFORM).build())
                 .build()
 
         val fidoClient = Fido.getFido2ApiClient(activity)
@@ -160,17 +161,17 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateSigning(result: Result, keyHandleBase64: String, challenge: String, rpDomain: String) {
+    private fun initiateSigning(result: Result, keyHandleBase64: List<String>, challenge: String, rpDomain: String) {
         val options = PublicKeyCredentialRequestOptions.Builder()
                 .setRpId(rpDomain)
                 .setAllowList(
-                        listOf(
-                                PublicKeyCredentialDescriptor(
-                                        PublicKeyCredentialType.PUBLIC_KEY.toString(),
-                                        keyHandleBase64.decodeBase64(),
-                                        null
-                                )
+                    keyHandleBase64.map{
+                        PublicKeyCredentialDescriptor(
+                            PublicKeyCredentialType.PUBLIC_KEY.toString(),
+                            it.decodeBase64(),
+                            null
                         )
+                    }
                 )
                 .setChallenge(challenge.decodeBase64())
                 .build()
