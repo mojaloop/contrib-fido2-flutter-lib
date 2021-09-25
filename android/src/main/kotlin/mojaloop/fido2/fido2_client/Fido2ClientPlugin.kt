@@ -163,6 +163,10 @@ public class Fido2ClientPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
 
         val fidoClient = Fido.getFido2ApiClient(activity)
         val registerIntent = fidoClient.getRegisterPendingIntent(options)
+        registerIntent.addOnFailureListener {
+            val errCode = "FAILED_TO_GET_REGISTER_INTENT"
+            result.error(errCode, it.message, null);
+        }
         registerIntent.addOnSuccessListener { pendingIntent ->
             if (pendingIntent != null) {
                 // Start a FIDO2 registration request.
@@ -175,13 +179,9 @@ public class Fido2ClientPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
                     0
                 )
             } else {
-                // TODO: Handle error
+                val errCode = "FAILED_TO_GET_REGISTER_INTENT"
+                result.error(errCode, "An error occurred", null);
             }
-        }
-
-        registerIntent.addOnFailureListener {
-            val errCode = "FAILED_TO_GET_REGISTER_INTENT"
-            result.error(errCode, it.message, null);
         }
     }
 
@@ -218,7 +218,8 @@ public class Fido2ClientPlugin : FlutterPlugin, MethodCallHandler, ActivityAware
                     0
                 )
             } else {
-                // TODO: Handle error
+                val errCode = "FAILED_TO_GET_SIGNING_INTENT"
+                result.error(errCode, "An error occurred", null);
             }
         }
 
