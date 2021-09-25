@@ -86,7 +86,13 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     val rpDomain = call.argument<String>("rpDomain")!!
                     val rpName = call.argument<String>("rpName")!!
                     val coseAlgoValue = call.argument<String>("coseAlgoValue")!!
-                    initiateRegistration(result, challenge, userId, username, rpDomain, rpName, coseAlgoValue.split(",").map{it.toInt()})
+                    val excludeCredentials = if(call.argument<String>("excludeCredentials") != null){
+                        call.argument<String>("excludeCredentials").split(",").map{it.trim()}
+                    }
+                    else listOf<String>()
+
+                    initiateRegistration(result, challenge, userId, username, rpDomain,
+                        rpName, coseAlgoValue.split(",").map{it.toInt()}, excludeCredentials)
                 }
                 catch (e: NullPointerException) {
                     val errCode = "MISSING_ARGUMENTS"
@@ -113,7 +119,8 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateRegistration(result: Result, challenge: String, userId: String, username: String, rpDomain: String, rpName: String, coseAlgoValue: List<Int>) {
+    private fun initiateRegistration(result: Result, challenge: String, userId: String, username: String,
+                                     rpDomain: String, rpName: String, coseAlgoValue: List<Int>, excludeCredentials: List<String>) {
         val rpEntity = PublicKeyCredentialRpEntity(rpDomain, rpName, null)
         val options = PublicKeyCredentialCreationOptions.Builder()
                 .setRp(rpEntity)
@@ -134,6 +141,15 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                             )
                         }
                 )
+            .setExcludeList(
+                excludeCredentials.map {
+                    PublicKeyCredentialDescriptor(
+                        PublicKeyCredentialType.PUBLIC_KEY.toString(),
+                        it.decodeBase64(),
+                        null
+                    )
+                }
+            )
             .setAuthenticatorSelection(AuthenticatorSelectionCriteria.Builder().setAttachment(Attachment.PLATFORM).build())
                 .build()
 
