@@ -21,13 +21,14 @@ import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
 /** Fido2ClientPlugin */
-public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.ActivityResultListener {
+public class Fido2ClientPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
+    PluginRegistry.ActivityResultListener {
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
-    private lateinit var channel : MethodChannel
-    private var binding: ActivityPluginBinding?= null
+    private lateinit var channel: MethodChannel
+    private var binding: ActivityPluginBinding? = null
     private var activity: Activity? = null
 
     companion object {
@@ -43,7 +44,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         const val REGISTER_REQUEST_CODE = 1
         const val SIGN_REQUEST_CODE = 2
     }
-    
+
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "fido2_client")
         channel.setMethodCallHandler(this)
@@ -70,6 +71,7 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         binding = null
         activity = null
     }
+
     private fun attachToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity;
         binding.addActivityResultListener(this)
@@ -85,13 +87,21 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     val username = call.argument<String>("username")!!
                     val rpDomain = call.argument<String>("rpDomain")!!
                     val rpName = call.argument<String>("rpName")!!
-                    val coseAlgoValue = call.argument<Int>("coseAlgoValue")!!
-                    initiateRegistration(result, challenge, userId, username, rpDomain, rpName, coseAlgoValue)
-                }
-                catch (e: NullPointerException) {
+                    val coseAlgoValue = call.argument<String>("coseAlgoValue")!!
+                    val excludeCredentials = call.argument<String>("excludeCredentials")
+                    val credentials =
+                        if (excludeCredentials != null) {
+                            excludeCredentials.split(",").map { it.trim() }
+                        } else listOf<String>()
+
+                    initiateRegistration(result, challenge, userId, username, rpDomain,
+                        rpName, coseAlgoValue.split(",").map { it.toInt() }, credentials
+                    )
+                } catch (e: NullPointerException) {
                     val errCode = "MISSING_ARGUMENTS"
-                    val errMsg = "One or more of the arguments provided are null. None of the arguments can be null!"
-                    result.error(errCode, errMsg,null)
+                    val errMsg =
+                        "One or more of the arguments provided are null. None of the arguments can be null!"
+                    result.error(errCode, errMsg, null)
                 }
             }
             "initiateSigning" -> {
@@ -99,12 +109,12 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
                     val keyHandleBase64 = call.argument<String>("keyHandle")!!
                     val challenge = call.argument<String>("challenge")!!
                     val rpDomain = call.argument<String>("rpDomain")!!
-                    initiateSigning(result, keyHandleBase64, challenge, rpDomain)
-                }
-                catch (e: NullPointerException) {
+                    initiateSigning(result, keyHandleBase64.trim().split(","), challenge, rpDomain)
+                } catch (e: NullPointerException) {
                     val errCode = "MISSING_ARGUMENTS"
-                    val errMsg = "One or more of the arguments provided are null. None of the arguments can be null!"
-                    result.error(errCode, errMsg,null)
+                    val errMsg =
+                        "One or more of the arguments provided are null. None of the arguments can be null!"
+                    result.error(errCode, errMsg, null)
                 }
             }
             else -> {
@@ -113,81 +123,103 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    private fun initiateRegistration(result: Result, challenge: String, userId: String, username: String, rpDomain: String, rpName: String, coseAlgoValue: Int) {
+    private fun initiateRegistration(
+        result: Result, challenge: String, userId: String, username: String,
+        rpDomain: String, rpName: String, coseAlgoValue: List<Int>, excludeCredentials: List<String>
+    ) {
         val rpEntity = PublicKeyCredentialRpEntity(rpDomain, rpName, null)
         val options = PublicKeyCredentialCreationOptions.Builder()
-                .setRp(rpEntity)
-                .setUser(
-                        PublicKeyCredentialUserEntity(
-                                userId.decodeBase64(),
-                                userId,
-                                null,
-                                username
-                        )
+            .setRp(rpEntity)
+            .setUser(
+                PublicKeyCredentialUserEntity(
+                    userId.decodeBase64(),
+                    userId,
+                    null,
+                    username
                 )
-                .setChallenge(challenge.decodeBase64())
-                .setParameters(
-                        listOf(
-                                PublicKeyCredentialParameters(
-                                        PublicKeyCredentialType.PUBLIC_KEY.toString(),
-                                        coseAlgoValue
-                                )
-                        )
-                )
-                .build()
+            )
+            .setChallenge(challenge.decodeBase64())
+            .setParameters(
+                coseAlgoValue.map {
+                    PublicKeyCredentialParameters(
+                        PublicKeyCredentialType.PUBLIC_KEY.toString(),
+                        it
+                    )
+                }
+            )
+            .setExcludeList(
+                excludeCredentials.map {
+                    PublicKeyCredentialDescriptor(
+                        PublicKeyCredentialType.PUBLIC_KEY.toString(),
+                        it.decodeBase64(),
+                        null
+                    )
+                }
+            )
+            .setAuthenticatorSelection(
+                AuthenticatorSelectionCriteria.Builder().setAttachment(Attachment.PLATFORM).build()
+            )
+            .build()
 
         val fidoClient = Fido.getFido2ApiClient(activity)
         val registerIntent = fidoClient.getRegisterPendingIntent(options)
-        registerIntent.addOnSuccessListener { pendingIntent ->
-            if (pendingIntent != null) {
-                // Start a FIDO2 registration request.
-                activity?.startIntentSenderForResult(
-                        pendingIntent.intentSender,
-                        REGISTER_REQUEST_CODE,
-                        null,
-                        0,
-                        0,
-                        0)
-            }
-            else {
-                // TODO: Handle error
-            }
-        }
-
         registerIntent.addOnFailureListener {
             val errCode = "FAILED_TO_GET_REGISTER_INTENT"
             result.error(errCode, it.message, null);
         }
+        registerIntent.addOnSuccessListener { pendingIntent ->
+            if (pendingIntent != null) {
+                // Start a FIDO2 registration request.
+                activity?.startIntentSenderForResult(
+                    pendingIntent.intentSender,
+                    REGISTER_REQUEST_CODE,
+                    null,
+                    0,
+                    0,
+                    0
+                )
+            } else {
+                val errCode = "FAILED_TO_GET_REGISTER_INTENT"
+                result.error(errCode, "An error occurred", null);
+            }
+        }
     }
 
-    private fun initiateSigning(result: Result, keyHandleBase64: String, challenge: String, rpDomain: String) {
+    private fun initiateSigning(
+        result: Result,
+        keyHandleBase64: List<String>,
+        challenge: String,
+        rpDomain: String
+    ) {
         val options = PublicKeyCredentialRequestOptions.Builder()
-                .setRpId(rpDomain)
-                .setAllowList(
-                        listOf(
-                                PublicKeyCredentialDescriptor(
-                                        PublicKeyCredentialType.PUBLIC_KEY.toString(),
-                                        keyHandleBase64.decodeBase64(),
-                                        null
-                                )
-                        )
-                )
-                .setChallenge(challenge.decodeBase64())
-                .build()
+            .setRpId(rpDomain)
+            .setAllowList(
+                keyHandleBase64.map {
+                    PublicKeyCredentialDescriptor(
+                        PublicKeyCredentialType.PUBLIC_KEY.toString(),
+                        it.decodeBase64(),
+                        null
+                    )
+                }
+            )
+            .setChallenge(challenge.decodeBase64())
+            .build()
 
         val fidoClient = Fido.getFido2ApiClient(activity)
         val signingIntent = fidoClient.getSignPendingIntent(options)
         signingIntent.addOnSuccessListener { pendingIntent ->
-            if(pendingIntent != null) {
-                activity?.startIntentSenderForResult(pendingIntent.intentSender,
-                        SIGN_REQUEST_CODE,
-                        null,
-                        0,
-                        0,
-                        0)
-            }
-            else {
-                // TODO: Handle error
+            if (pendingIntent != null) {
+                activity?.startIntentSenderForResult(
+                    pendingIntent.intentSender,
+                    SIGN_REQUEST_CODE,
+                    null,
+                    0,
+                    0,
+                    0
+                )
+            } else {
+                val errCode = "FAILED_TO_GET_SIGNING_INTENT"
+                result.error(errCode, "An error occurred", null);
             }
         }
 
@@ -200,11 +232,14 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         when (resultCode) {
             RESULT_OK -> {
-                data?.let {
-                    if (it.hasExtra(Fido.FIDO2_KEY_ERROR_EXTRA)) {
-                        handleErrorResponse(requestCode, data.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA))
-                    } else if (it.hasExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)) {
-                        val fido2Response = data.getByteArrayExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)
+                if (data != null) {
+                    if (data.hasExtra(Fido.FIDO2_KEY_ERROR_EXTRA)) {
+                        handleErrorResponse(
+                            requestCode,
+                            data.getByteArrayExtra(Fido.FIDO2_KEY_ERROR_EXTRA)!!
+                        )
+                    } else if (data.hasExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)) {
+                        val fido2Response = data.getByteArrayExtra(Fido.FIDO2_KEY_RESPONSE_EXTRA)!!
                         when (requestCode) {
                             REGISTER_REQUEST_CODE -> processRegisterResponse(fido2Response)
                             SIGN_REQUEST_CODE -> processSigningResponse(fido2Response)
@@ -214,7 +249,22 @@ public class Fido2ClientPlugin: FlutterPlugin, MethodCallHandler, ActivityAware,
             }
             RESULT_CANCELED -> {
                 val errorName = "FIDO_PROCESS_INTERRUPTED"
-                val errorMessage = "The authentication process was interrupted before the user could complete verification."
+                val errorMessage =
+                    "The authentication process was interrupted before the user could complete verification."
+
+                val args = HashMap<String, String>()
+                args["errorName"] = errorName
+                args["errorMsg"] = errorMessage
+
+                when (requestCode) {
+                    REGISTER_REQUEST_CODE -> channel.invokeMethod("onRegAuthError", args)
+                    SIGN_REQUEST_CODE -> channel.invokeMethod("onSignAuthError", args)
+                }
+            }
+
+            else -> {
+                val errorName = "FIDO_PROCESS_INTERRUPTED"
+                val errorMessage = "Unhandled result code"
 
                 val args = HashMap<String, String>()
                 args["errorName"] = errorName

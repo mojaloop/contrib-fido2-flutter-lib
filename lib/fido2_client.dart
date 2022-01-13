@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:fido2_client/registration_result.dart';
 import 'package:fido2_client/signing_result.dart';
 import 'package:flutter/services.dart';
@@ -83,7 +84,10 @@ class Fido2Client {
   /// The method returns a [RegistrationResult] future that is completed after the
   /// user completes the authentication process.
   Future<RegistrationResult> initiateRegistration(
-      String challenge, String userId, Map<String, dynamic> options) async {
+    String challenge,
+    String userId,
+    Map<String, dynamic> options,
+  ) async {
     Map<String, dynamic> args = options;
     args.putIfAbsent('challenge', () => challenge);
     args.putIfAbsent('userId', () => userId);
@@ -95,7 +99,8 @@ class Fido2Client {
   ///
   /// This launches the FIDO client which authenticates the user whose credentials
   /// were previously registered and are associated with the credential identifier
-  /// [keyHandle]. This [keyHandle] should match the one produced in the registration
+  /// [keyHandle]. This [keyHandle] is a comma seperated list of credential ids,
+  /// and should match the one produced in the registration
   /// phase for the same user ([RegistrationResult.keyHandle]).
   ///
   ///
