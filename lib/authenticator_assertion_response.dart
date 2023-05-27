@@ -1,30 +1,28 @@
 import 'dart:typed_data';
 
 import 'package:fido2_client/authenticator_response.dart';
-import 'package:fido2_client/fido2_client_web.dart';
-import 'package:fido2_client/public_key_credential.dart';
 import 'package:js/js.dart';
 
 @JS()
 @anonymous
 class AuthenticatorAssertionResponseJS {
-  Uint8List authenticatorData;
-  Uint8List clientDataJSON;
-  Uint8List signature;
-  Uint8List userHandle;
+  late Uint8List authenticatorData;
+  late Uint8List clientDataJSON;
+  late Uint8List signature;
+  late Uint8List userHandle;
 }
 
 class AuthenticatorAssertionResponse extends AuthenticatorResponse {
-  List<int> authenticatorData;
-  List<int> clientDataJSON;
-  List<int> signature;
-  List<int> userHandle;
+  final List<int> authenticatorData;
+  final List<int> clientDataJSON;
+  final List<int> signature;
+  final List<int> userHandle;
 
   AuthenticatorAssertionResponse({
-    this.authenticatorData,
-    this.clientDataJSON,
-    this.signature,
-    this.userHandle,
+    required this.authenticatorData,
+    required this.clientDataJSON,
+    required this.signature,
+    required this.userHandle,
   });
 
   static AuthenticatorAssertionResponse fromJs(
@@ -40,11 +38,11 @@ class AuthenticatorAssertionResponse extends AuthenticatorResponse {
   static AuthenticatorAssertionResponse fromJson(Map<String, dynamic> json) {
     return AuthenticatorAssertionResponse(
       authenticatorData:
-          (json['authenticatorData'] as List)?.map((i) => i as int)?.toList(),
+          (json['authenticatorData'] as List).map((i) => i as int).toList(),
       clientDataJSON:
-          (json['clientDataJSON'] as List)?.map((i) => i as int)?.toList(),
-      signature: (json['signature'] as List)?.map((i) => i as int)?.toList(),
-      userHandle: (json['userHandle'] as List)?.map((i) => i as int)?.toList(),
+          (json['clientDataJSON'] as List).map((i) => i as int).toList(),
+      signature: (json['signature'] as List).map((i) => i as int).toList(),
+      userHandle: (json['userHandle'] as List).map((i) => i as int).toList(),
     );
   }
 

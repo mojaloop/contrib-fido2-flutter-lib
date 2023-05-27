@@ -1,7 +1,6 @@
 @JS()
 library fido2_client_plugin_web;
 
-import 'package:fido2_client/authenticator_attestation_response.dart';
 import 'package:fido2_client/public_key_credential.dart';
 import 'package:js/js.dart';
 import 'package:js/js_util.dart';
@@ -146,7 +145,7 @@ class Fido2ClientWeb {
   /// user completes the authentication process.
   Future<PublicKeyCredential> initiateSigning(
       List<dynamic> keyHandle, String challenge,
-      [String rpDomain]) async {
+      {required String rpDomain}) async {
     var publicKeyCredentialJS = await promiseToFuture(
         web_initiateSigning(keyHandle, challenge, rpDomain));
 
