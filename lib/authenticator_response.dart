@@ -6,7 +6,7 @@ import 'package:js/js.dart';
 @JS()
 @anonymous
 class AuthenticatorResponseJS {
-  String type;
+  late String type;
 }
 
 /// Can either be a AuthenticatorAssertionResponse, or

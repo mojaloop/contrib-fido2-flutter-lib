@@ -60,7 +60,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget buildRegButton() {
-    return RaisedButton(
+    return ElevatedButton(
       child: Text('FIDO Register'),
       onPressed: () async {
         Map<String, dynamic> options = {
@@ -87,13 +87,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget buildSignButton() {
-    return RaisedButton(
+    return ElevatedButton(
       child: Text('FIDO Sign'),
       onPressed: keyHandle == null
           ? null
           : () async {
               SigningResult res = await fidoClient.initiateSigning(
-                  keyHandle, signChallenge, rpDomain);
+                  keyHandle, signChallenge,
+                  rpDomain: rpDomain);
               setState(() {
                 // Decoding the clientData to be JSON so that it is human readable
                 Uint8List decodedClientData = base64Url.decode(res.clientData);

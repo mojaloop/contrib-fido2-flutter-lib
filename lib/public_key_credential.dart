@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import 'package:fido2_client/authenticator_response.dart';
 import 'package:js/js.dart';
 
@@ -8,18 +6,19 @@ import 'package:js/js.dart';
 @JS()
 @anonymous
 class PublicKeyCredentialJS {
-  String id;
-  List<int> rawId;
-  AuthenticatorResponseJS response;
+  late String id;
+  late List<int> rawId;
+  late AuthenticatorResponseJS response;
 }
 
 /// Native PublicKeyCredential in Dart Land
 class PublicKeyCredential {
-  String id;
-  List<int> rawId;
-  AuthenticatorResponse response;
+  final String id;
+  final List<int> rawId;
+  final AuthenticatorResponse response;
 
-  PublicKeyCredential({this.id, this.rawId, this.response});
+  PublicKeyCredential(
+      {required this.id, required this.rawId, required this.response});
 
   static fromJs(PublicKeyCredentialJS credential) {
     return new PublicKeyCredential(
@@ -31,11 +30,9 @@ class PublicKeyCredential {
   static PublicKeyCredential fromJson(Map<String, dynamic> json) {
     return PublicKeyCredential(
         id: (json['id'] as String),
-        rawId: (json['rawId'] as List)?.map((i) => i as int)?.toList(),
-        response: json['response'] == null
-            ? null
-            : AuthenticatorResponse.fromJson(
-                json['response'] as Map<String, dynamic>));
+        rawId: (json['rawId'] as List).map((i) => i as int).toList(),
+        response: AuthenticatorResponse.fromJson(
+            json['response'] as Map<String, dynamic>));
   }
 
   Map<String, dynamic> toJson() {
